@@ -15,11 +15,17 @@ async function getLikes() {
     if (!email || !password || !profileId) {
         throw new Error("email or password or profileId env vars not set");
     }
-    const browser = await createBrowser();
-    await createPage(browser);
-    await login(page);
-    await goToLikesPage(page);
-    await browser.close();
+    try {
+        const browser = await createBrowser();
+        await createPage(browser);
+        await login();
+        await goToLikesPage();
+        await getRecentLikes();
+        await browser.close();
+    }
+    catch (error) {
+        console.error("error getting likes: ", error);
+    }
     console.log("finished");
 }
 exports.default = getLikes;
@@ -36,7 +42,7 @@ async function createPage(browser) {
     _page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"); //so we don't look like a bot
     page = _page;
 }
-async function login(page) {
+async function login() {
     await page.goto(utils_1.likesPageURL(profileId));
     await page.waitForSelector("#email");
     await page.type("#email", email);
@@ -51,7 +57,7 @@ async function login(page) {
     await page.screenshot({ path: `${constants_1.default.screenshotsDir}/login.png` });
     console.log("login done");
 }
-async function goToLikesPage(page) {
+async function goToLikesPage() {
     await page.goto(utils_1.likesPageURL(profileId));
     await page.waitForSelector("#facebook");
     await page.screenshot({
@@ -59,4 +65,18 @@ async function goToLikesPage(page) {
     });
     console.log("at likes page");
 }
-async function getRecentLikes() { }
+async function getRecentLikes() {
+    const profileLinks = await page.$$(".profileLink");
+    let validPhotoURLs = [];
+    for (const profileLink of profileLinks) {
+        const hrefHandle = await profileLink.getProperty("href");
+        const innerTextHandle = await profileLink.getProperty("innerHTML");
+        const href = await hrefHandle.jsonValue();
+        const innerHTML = await innerTextHandle.jsonValue();
+        if (innerHTML === "photo" && !href.includes("photo.php")) {
+            //photo.php is only present in profile photo urls, not page photo urls, by inspection
+            validPhotoURLs.push(href);
+        }
+    }
+    console.log("valid photo urls: ", validPhotoURLs);
+}

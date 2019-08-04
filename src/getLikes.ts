@@ -13,11 +13,17 @@ export default async function getLikes() {
   if (!email || !password || !profileId) {
     throw new Error("email or password or profileId env vars not set")
   }
-  const browser = await createBrowser()
-  await createPage(browser)
-  await login(page)
-  await goToLikesPage(page)
-  await browser.close()
+  try {
+    const browser = await createBrowser()
+    await createPage(browser)
+    await login()
+    await goToLikesPage()
+    await getRecentLikes()
+    await browser.close()
+  } catch (error) {
+    console.error("error getting likes: ", error)
+  }
+
   console.log("finished")
 }
 
@@ -38,7 +44,7 @@ async function createPage(browser: puppeteer.Browser) {
   page = _page
 }
 
-async function login(page: puppeteer.Page) {
+async function login() {
   await page.goto(likesPageURL(profileId!))
   await page.waitForSelector("#email")
   await page.type("#email", email!)
@@ -54,7 +60,7 @@ async function login(page: puppeteer.Page) {
   console.log("login done")
 }
 
-async function goToLikesPage(page: puppeteer.Page) {
+async function goToLikesPage() {
   await page.goto(likesPageURL(profileId!))
   await page.waitForSelector("#facebook")
   await page.screenshot({
@@ -63,4 +69,19 @@ async function goToLikesPage(page: puppeteer.Page) {
   console.log("at likes page")
 }
 
-async function getRecentLikes() {}
+async function getRecentLikes() {
+  const profileLinks = await page.$$(".profileLink")
+  let validPhotoURLs: string[] = []
+
+  for (const profileLink of profileLinks) {
+    const hrefHandle = await profileLink.getProperty("href")
+    const innerTextHandle = await profileLink.getProperty("innerHTML")
+    const href: string = await hrefHandle.jsonValue()
+    const innerHTML: string = await innerTextHandle.jsonValue()
+    if (innerHTML === "photo" && !href.includes("photo.php")) {
+      //photo.php is only present in profile photo urls, not page photo urls, by inspection
+      validPhotoURLs.push(href)
+    }
+  }
+  console.log("valid photo urls: ", validPhotoURLs)
+}
