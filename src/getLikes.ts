@@ -11,7 +11,7 @@ export default async function getLikes() {
   }
   const browser = await puppeteer.launch({
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    args: ["--no-sandbox"]
   })
   const page = await browser.newPage()
   await page.setCacheEnabled(true)
