@@ -21,8 +21,9 @@ async function getLikes() {
         await createPage(browser);
         await login();
         await goToLikesPage();
-        await getRecentLikes();
+        const photoURLs = await getRecentLikes();
         await browser.close();
+        return photoURLs;
     }
     catch (error) {
         console.error("error getting likes: ", error);
@@ -77,4 +78,5 @@ async function getRecentLikes() {
         }
     }
     console.log("valid photo urls: ", validPhotoURLs);
+    return validPhotoURLs;
 }

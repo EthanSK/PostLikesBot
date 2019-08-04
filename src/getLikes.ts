@@ -19,8 +19,9 @@ export default async function getLikes() {
     await createPage(browser)
     await login()
     await goToLikesPage()
-    await getRecentLikes()
+    const photoURLs = await getRecentLikes()
     await browser.close()
+    return photoURLs
   } catch (error) {
     console.error("error getting likes: ", error)
   }
@@ -67,7 +68,7 @@ async function goToLikesPage() {
   console.log("at likes page")
 }
 
-async function getRecentLikes() {
+async function getRecentLikes(): Promise<string[]> {
   const profileLinks = await page.$$(".profileLink")
   let validPhotoURLs: string[] = []
 
@@ -82,4 +83,5 @@ async function getRecentLikes() {
     }
   }
   console.log("valid photo urls: ", validPhotoURLs)
+  return validPhotoURLs
 }
