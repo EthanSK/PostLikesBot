@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "concurrently \"nodemon\" \"npm run tsWatch\"",
     "start": "node .",
-    "tsWatch": "tsc -W",
-    "build": "tsc"
+    "tsWatch": "tsc -W"
   },
   "author": "Ethan Sarif-Kattan",
   "license": "ISC",
