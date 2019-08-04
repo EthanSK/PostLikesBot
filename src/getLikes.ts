@@ -11,7 +11,7 @@ export default async function getLikes() {
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
   await page.setCacheEnabled(true)
-  await page.goto("www.facebook.com")
+  await page.goto(likesPageURL(profileId))
   await page.screenshot({ path: "1.png" })
   await page.waitForSelector("#email")
   await page.type("#email", email)

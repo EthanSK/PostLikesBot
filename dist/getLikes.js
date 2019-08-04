@@ -13,17 +13,18 @@ async function getLikes() {
     }
     const browser = await puppeteer_1.default.launch();
     const page = await browser.newPage();
+    await page.setCacheEnabled(true);
     await page.goto(likesPageURL(profileId));
     await page.screenshot({ path: "1.png" });
     await page.waitForSelector("#email");
     await page.type("#email", email);
     await page.type("#pass", password);
-    await delay(500);
+    await delay(5000);
     await page.click("#loginbutton");
     console.log("login done");
-    await delay(1000);
+    await delay(5000);
     await page.goto(likesPageURL(profileId));
-    await delay(500);
+    await delay(5000);
     await page.screenshot({ path: "2.png" });
     console.log("at likes page");
     await browser.close();
