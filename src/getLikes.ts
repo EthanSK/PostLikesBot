@@ -9,7 +9,10 @@ export default async function getLikes() {
   if (!email || !password || !profileId) {
     throw new Error("email or password or profileId env vars not set")
   }
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  })
   const page = await browser.newPage()
   await page.setCacheEnabled(true)
   await page.goto(likesPageURL(profileId))
