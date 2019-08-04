@@ -32,7 +32,8 @@ exports.default = getLikes;
 async function createBrowser() {
     const browser = await puppeteer_1.default.launch({
         headless: !shouldShowHead,
-        slowMo: constants_1.default.slowMo
+        slowMo: constants_1.default.slowMo,
+        args: ["--no-sandbox"]
     });
     return browser;
 }

@@ -30,7 +30,8 @@ export default async function getLikes() {
 async function createBrowser() {
   const browser = await puppeteer.launch({
     headless: !shouldShowHead,
-    slowMo: constants.slowMo
+    slowMo: constants.slowMo,
+    args: ["--no-sandbox"]
   })
   return browser
 }
