@@ -6,6 +6,7 @@ const email = process.env.FACEBOOK_EMAIL
 const password = process.env.FACEBOOK_PASSWORD
 const profileId = process.env.FACEBOOK_PROFILE_ID
 const shouldShowHead = process.env.SHOW_PUPPETEER_HEAD
+const nodeEnv = process.env.NODE_ENV
 
 let page: puppeteer.Page
 
@@ -57,16 +58,12 @@ async function login() {
     await page.type("#pass", password!)
     await page.click("#loginbutton")
   }
-  await page.screenshot({ path: `${constants.screenshotsDir}/login.png` })
   console.log("login done")
 }
 
 async function goToLikesPage() {
   await page.goto(likesPageURL(profileId!))
   await page.waitForSelector("#facebook")
-  await page.screenshot({
-    path: `${constants.screenshotsDir}/activityLogLikes.png`
-  })
   console.log("at likes page")
 }
 

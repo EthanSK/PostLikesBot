@@ -10,6 +10,7 @@ const email = process.env.FACEBOOK_EMAIL;
 const password = process.env.FACEBOOK_PASSWORD;
 const profileId = process.env.FACEBOOK_PROFILE_ID;
 const shouldShowHead = process.env.SHOW_PUPPETEER_HEAD;
+const nodeEnv = process.env.NODE_ENV;
 let page;
 async function getLikes() {
     if (!email || !password || !profileId) {
@@ -55,15 +56,11 @@ async function login() {
         await page.type("#pass", password);
         await page.click("#loginbutton");
     }
-    await page.screenshot({ path: `${constants_1.default.screenshotsDir}/login.png` });
     console.log("login done");
 }
 async function goToLikesPage() {
     await page.goto(utils_1.likesPageURL(profileId));
     await page.waitForSelector("#facebook");
-    await page.screenshot({
-        path: `${constants_1.default.screenshotsDir}/activityLogLikes.png`
-    });
     console.log("at likes page");
 }
 async function getRecentLikes() {
