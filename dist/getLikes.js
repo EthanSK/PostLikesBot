@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
+const email = process.env.FACEBOOK_EMAIL;
+const password = process.env.FACEBOOK_PASSWORD;
+const profileId = process.env.FACEBOOK_PROFILE_ID;
 async function getLikes() {
-    const email = process.env.FACEBOOK_EMAIL;
-    const password = process.env.FACEBOOK_PASSWORD;
-    const profileId = process.env.FACEBOOK_PROFILE_ID;
     if (!email || !password || !profileId) {
         throw new Error("email or password or profileId env vars not set");
     }

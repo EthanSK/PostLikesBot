@@ -1,10 +1,11 @@
 import puppeteer from "puppeteer"
 import constants from "./constants"
 
+const email = process.env.FACEBOOK_EMAIL
+const password = process.env.FACEBOOK_PASSWORD
+const profileId = process.env.FACEBOOK_PROFILE_ID
+
 export default async function getLikes() {
-  const email = process.env.FACEBOOK_EMAIL
-  const password = process.env.FACEBOOK_PASSWORD
-  const profileId = process.env.FACEBOOK_PROFILE_ID
   if (!email || !password || !profileId) {
     throw new Error("email or password or profileId env vars not set")
   }

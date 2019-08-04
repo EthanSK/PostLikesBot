@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
-import getLikes from "./getlikes"
+import getLikes from "./getLikes"
 
 try {
   getLikes()
