@@ -1,4 +1,8 @@
-const constants = {}
+const constants = {
+  delayMillis: 2000,
+  slowMo: 10,
+  screenshotsDir: "./logs/screenshots"
+}
 
 export default constants
 
