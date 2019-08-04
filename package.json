@@ -1,11 +1,27 @@
 {
   "name": "postlikesbot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Bot",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"nodemon\" \"npm run tsWatch\"",
+    "start": "node .",
+    "tsWatch": "tsc -W",
+    "build": "tsc"
   },
   "author": "Ethan Sarif-Kattan",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "concurrently": "^4.1.1",
+    "dotenv": "^8.0.0",
+    "puppeteer": "^1.19.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.12",
+    "@types/dotenv": "^6.1.1",
+    "@types/puppeteer": "^1.19.0",
+    "@types/request": "^2.48.2"
+  }
 }
