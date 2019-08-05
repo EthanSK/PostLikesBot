@@ -1,7 +1,9 @@
 const constants = {
   delayMillis: 2000,
   slowMo: 10,
-  screenshotsDir: "./logs/screenshots"
+  screenshotsDir: "./logs/screenshots",
+
+  mongoDatabaseName: "PostLikesBotDB"
 }
 
 export default constants
