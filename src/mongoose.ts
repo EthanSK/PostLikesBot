@@ -1,4 +1,4 @@
-import mongoose, { DeepPartial } from "mongoose"
+import mongoose, { Schema, Document } from "mongoose"
 import dotenv from "dotenv"
 import constants from "./constants"
 dotenv.config()
@@ -7,14 +7,20 @@ const mongoUsername = process.env.MONGO_USERNAME
 const mongoPassword = process.env.MONGO_PASSWORD
 
 let memeSchema = new mongoose.Schema({
-  url: String,
-  isPosted: Boolean,
+  url: { type: String, required: true, unique: true },
+  isPosted: { type: Boolean, required: true, unique: true },
   timePosted: Number
 })
 
-let Meme = mongoose.model("Meme", memeSchema)
+interface IMeme extends Document {
+  url: string
+  isPosted: boolean
+  timePosted?: number
+}
 
-async function mongooseConnect() {
+let memeModel = mongoose.model<IMeme>("Meme", memeSchema)
+
+export async function mongooseConnect() {
   console.log("mongo username: ", mongoUsername)
   if (!mongoUsername || !mongoPassword) {
     throw new Error("mongo username or password not set in env vars")
@@ -34,12 +40,33 @@ async function mongooseConnect() {
   )
 }
 
-mongooseConnect()
+export async function saveNewDocToMongo(url: string) {
+  let meme = new memeModel({
+    url,
+    isPosted: false
+  })
+  await meme.save()
+}
 
-// async function saveToMongo(_url: string) {
-//   let meme = new Meme({
-//     url: "test"
-//   })
-// }
+export async function updateIsPosted(isPosted: boolean, url: string) {
+  let obj = {
+    timePosted: Date.now(),
+    isPosted: isPosted
+  }
+  await memeModel.updateOne({ url }, { $set: obj }).exec()
+}
 
-async function checkIfPosted(url: string) {}
+export async function checkIfDocExists(url: string): Promise<boolean> {
+  let meme = await memeModel.findOne({ url }).exec()
+  if (meme) {
+    return true
+  }
+  return false
+}
+export async function checkIfPosted(url: string): Promise<boolean> {
+  let meme = await memeModel.findOne({ url }).exec()
+  if (meme && meme.isPosted) {
+    return true
+  }
+  return false
+}

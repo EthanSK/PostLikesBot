@@ -10,11 +10,11 @@ dotenv_1.default.config();
 const mongoUsername = process.env.MONGO_USERNAME;
 const mongoPassword = process.env.MONGO_PASSWORD;
 let memeSchema = new mongoose_1.default.Schema({
-    url: String,
-    isPosted: Boolean,
+    url: { type: String, required: true, unique: true },
+    isPosted: { type: Boolean, required: true, unique: true },
     timePosted: Number
 });
-let Meme = mongoose_1.default.model("Meme", memeSchema);
+let memeModel = mongoose_1.default.model("Meme", memeSchema);
 async function mongooseConnect() {
     console.log("mongo username: ", mongoUsername);
     if (!mongoUsername || !mongoPassword) {
@@ -27,10 +27,36 @@ async function mongooseConnect() {
     });
     return mongoose_1.default.connect(`mongodb+srv://${mongoUsername}:${mongoPassword}@postlikesbot-28rjt.mongodb.net/${constants_1.default.mongoDatabaseName}?retryWrites=true&w=majority`, { useNewUrlParser: true });
 }
-mongooseConnect();
-// async function saveToMongo(_url: string) {
-//   let meme = new Meme({
-//     url: "test"
-//   })
-// }
-async function checkIfPosted(url) { }
+exports.mongooseConnect = mongooseConnect;
+async function saveNewDocToMongo(url) {
+    let meme = new memeModel({
+        url,
+        isPosted: false
+    });
+    await meme.save();
+}
+exports.saveNewDocToMongo = saveNewDocToMongo;
+async function updateIsPosted(isPosted, url) {
+    let obj = {
+        timePosted: Date.now(),
+        isPosted: isPosted
+    };
+    await memeModel.updateOne({ url }, { $set: obj }).exec();
+}
+exports.updateIsPosted = updateIsPosted;
+async function checkIfDocExists(url) {
+    let meme = await memeModel.findOne({ url }).exec();
+    if (meme) {
+        return true;
+    }
+    return false;
+}
+exports.checkIfDocExists = checkIfDocExists;
+async function checkIfPosted(url) {
+    let meme = await memeModel.findOne({ url }).exec();
+    if (meme && meme.isPosted) {
+        return true;
+    }
+    return false;
+}
+exports.checkIfPosted = checkIfPosted;

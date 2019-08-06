@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants = {
-    delayMillis: 2000,
+    delayMillis: 5000,
     slowMo: 10,
     screenshotsDir: "./logs/screenshots",
     mongoDatabaseName: "PostLikesBotDB"
