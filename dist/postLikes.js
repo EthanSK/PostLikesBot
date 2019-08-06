@@ -6,7 +6,7 @@ const pageId = process.env.FACEBOOK_PAGE_ID;
 async function postLikes() {
     try {
         await goToFBPage();
-        await uploadImage();
+        // await uploadImage()
     }
     catch (error) {
         console.error("error posting likes: ", error);
@@ -38,7 +38,7 @@ async function uploadImage() {
         triggerFileSelect()
     ]);
     console.log("choosing image...");
-    await fileChooser.accept(["testImage.png"]);
+    await fileChooser.accept(["testImage.png"]); //rel to project root
     await utils_1.delay();
     // await page.screenshot({ path: "logs/screenshots/imagess.png" })
     console.log("sharing image...");

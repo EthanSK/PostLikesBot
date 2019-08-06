@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = __importDefault(require("./constants"));
+const fs_1 = __importDefault(require("fs"));
 function delay(ms = constants_1.default.defaultDelayMillis) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -16,3 +17,9 @@ function fbPageURL(pageId) {
     return `https://www.facebook.com/${pageId}`;
 }
 exports.fbPageURL = fbPageURL;
+async function saveImageUrlToDir(url) {
+    const dir = "./dir";
+    fs_1.default.unlinkSync(dir);
+    fs_1.default.mkdirSync(dir);
+}
+exports.saveImageUrlToDir = saveImageUrlToDir;

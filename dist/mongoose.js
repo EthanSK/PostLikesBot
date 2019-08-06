@@ -9,9 +9,10 @@ const constants_1 = __importDefault(require("./constants"));
 dotenv_1.default.config();
 const mongoUsername = process.env.MONGO_USERNAME;
 const mongoPassword = process.env.MONGO_PASSWORD;
+const maxNumToPostAtATime = process.env.MAX_NUMBER_TO_POST_AT_A_TIME;
 let memeSchema = new mongoose_1.default.Schema({
-    url: { type: String, required: true, unique: true },
-    isPosted: { type: Boolean, required: true, unique: true },
+    postUrl: { type: String, required: true, unique: true },
+    isPosted: { type: Boolean, required: true },
     timePosted: Number
 });
 let memeModel = mongoose_1.default.model("Meme", memeSchema);
@@ -28,35 +29,40 @@ async function mongooseConnect() {
     return mongoose_1.default.connect(`mongodb+srv://${mongoUsername}:${mongoPassword}@postlikesbot-28rjt.mongodb.net/${constants_1.default.mongoDatabaseName}?retryWrites=true&w=majority`, { useNewUrlParser: true });
 }
 exports.mongooseConnect = mongooseConnect;
-async function saveNewDocToMongo(url) {
+async function saveNewDocToMongo(postUrl) {
     let meme = new memeModel({
-        url,
+        postUrl,
         isPosted: false
     });
     await meme.save();
 }
 exports.saveNewDocToMongo = saveNewDocToMongo;
-async function updateIsPosted(isPosted, url) {
+async function updateIsPosted(isPosted, postUrl) {
     let obj = {
         timePosted: Date.now(),
         isPosted: isPosted
     };
-    await memeModel.updateOne({ url }, { $set: obj }).exec();
+    await memeModel.updateOne({ postUrl }, { $set: obj }).exec();
 }
 exports.updateIsPosted = updateIsPosted;
-async function checkIfDocExists(url) {
-    let meme = await memeModel.findOne({ url }).exec();
+async function checkIfDocExists(postUrl) {
+    let meme = await memeModel.findOne({ postUrl }).exec();
     if (meme) {
         return true;
     }
     return false;
 }
 exports.checkIfDocExists = checkIfDocExists;
-async function checkIfPosted(url) {
-    let meme = await memeModel.findOne({ url }).exec();
+async function checkIfPosted(postUrl) {
+    let meme = await memeModel.findOne({ postUrl }).exec();
     if (meme && meme.isPosted) {
         return true;
     }
     return false;
 }
 exports.checkIfPosted = checkIfPosted;
+async function getUnpostedPostUrls() {
+    const memes = await memeModel.find({ isPosted: false }).exec();
+    return memes.map(meme => meme.postUrl);
+}
+exports.getUnpostedPostUrls = getUnpostedPostUrls;

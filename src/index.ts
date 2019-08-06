@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
-import getLikes from "./getLikes"
+import getLikedPosts from "./getLikes"
 import {
   mongooseConnect,
   saveNewDocToMongo,
@@ -15,21 +15,22 @@ async function main() {
     const browser = await createBrowser()
     await createPage(browser)
     await login()
-    await postLikes()
 
-    // const urls = await getLikes()
-    // await mongooseConnect()
-    // if (!urls) {
-    //   return
-    // }
-    // for (const url of urls) {
-    //   const exists = await checkIfDocExists(url)
-    //   if (!exists) {
-    //     //so we don't overwrite the isposted data
-    //     await saveNewDocToMongo(url)
-    //   }
-    //   //   await updateIsPosted(false, url)
-    // }
+    const urls = await getLikedPosts()
+    await mongooseConnect()
+    if (!urls) {
+      return
+    }
+    for (const url of urls) {
+      const exists = await checkIfDocExists(url)
+      if (!exists) {
+        //so we don't overwrite the isposted data
+        await saveNewDocToMongo(url)
+      }
+      //   await updateIsPosted(false, url)
+    }
+
+    await postLikes()
 
     await browser.close()
   } catch (error) {
