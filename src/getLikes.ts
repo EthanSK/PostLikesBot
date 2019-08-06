@@ -38,12 +38,3 @@ async function getRecentImages(): Promise<string[]> {
   console.log("valid photo post urls: ", validPhotoURLs)
   return validPhotoURLs
 }
-
-export async function getImageUrl(postUrl: string): Promise<string | null> {
-  await page.goto(postUrl)
-  await page.waitForSelector(".spotlight")
-  await delay(200) //otherwise can bug out slightly and not get the correct element
-  const imageUrl = await page.$eval(".spotlight", el => el.getAttribute("src"))
-  console.log("image url: ", imageUrl, "from this post: ", postUrl)
-  return imageUrl
-}

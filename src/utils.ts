@@ -1,5 +1,10 @@
 import constants from "./constants"
 import fs from "fs"
+import path, { dirname } from "path"
+import { page } from "./puppeteer"
+import request from "request"
+import { rejects } from "assert"
+
 export function delay(ms: number = constants.defaultDelayMillis) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -12,8 +17,51 @@ export function fbPageURL(pageId: string): string {
   return `https://www.facebook.com/${pageId}`
 }
 
-export async function saveImageUrlToDir(url: string) {
-  const dir = "./dir"
-  fs.unlinkSync(dir)
+export async function getImageUrl(postUrl: string): Promise<string | null> {
+  await page.goto(postUrl)
+  await page.waitForSelector('img[class="spotlight"]')
+  const imageUrl = await page.$eval('img[class="spotlight"]', el =>
+    el.getAttribute("src")
+  )
+  console.log("image url: ", imageUrl, "from this post: ", postUrl)
+  return imageUrl
+}
+
+var deleteFolderRecursive = function(path: string) {
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach(function(file) {
+      var curPath = path + "/" + file
+      if (fs.lstatSync(curPath).isDirectory()) {
+        // recurse
+        deleteFolderRecursive(curPath)
+      } else {
+        // delete file
+        fs.unlinkSync(curPath)
+      }
+    })
+    fs.rmdirSync(path)
+  }
+}
+
+export function createNewDir(dir: string) {
+  if (fs.existsSync(dir)) {
+    deleteFolderRecursive(dir)
+  }
   fs.mkdirSync(dir)
+}
+
+export function downloadImage(uri: string, file: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    request.head(uri, function(err, res, body) {
+      request(uri)
+        .pipe(fs.createWriteStream(file))
+        .on("close", () => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
+    })
+  })
 }

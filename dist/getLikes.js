@@ -35,12 +35,3 @@ async function getRecentImages() {
     console.log("valid photo post urls: ", validPhotoURLs);
     return validPhotoURLs;
 }
-async function getImageUrl(postUrl) {
-    await puppeteer_1.page.goto(postUrl);
-    await puppeteer_1.page.waitForSelector(".spotlight");
-    await utils_1.delay(200); //otherwise can bug out slightly and not get the correct element
-    const imageUrl = await puppeteer_1.page.$eval(".spotlight", el => el.getAttribute("src"));
-    console.log("image url: ", imageUrl, "from this post: ", postUrl);
-    return imageUrl;
-}
-exports.getImageUrl = getImageUrl;

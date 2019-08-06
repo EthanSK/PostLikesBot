@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = __importDefault(require("./constants"));
 const fs_1 = __importDefault(require("fs"));
+const puppeteer_1 = require("./puppeteer");
+const request_1 = __importDefault(require("request"));
 function delay(ms = constants_1.default.defaultDelayMillis) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -17,9 +19,51 @@ function fbPageURL(pageId) {
     return `https://www.facebook.com/${pageId}`;
 }
 exports.fbPageURL = fbPageURL;
-async function saveImageUrlToDir(url) {
-    const dir = "./dir";
-    fs_1.default.unlinkSync(dir);
+async function getImageUrl(postUrl) {
+    await puppeteer_1.page.goto(postUrl);
+    await puppeteer_1.page.waitForSelector('img[class="spotlight"]');
+    const imageUrl = await puppeteer_1.page.$eval('img[class="spotlight"]', el => el.getAttribute("src"));
+    console.log("image url: ", imageUrl, "from this post: ", postUrl);
+    return imageUrl;
+}
+exports.getImageUrl = getImageUrl;
+var deleteFolderRecursive = function (path) {
+    if (fs_1.default.existsSync(path)) {
+        fs_1.default.readdirSync(path).forEach(function (file) {
+            var curPath = path + "/" + file;
+            if (fs_1.default.lstatSync(curPath).isDirectory()) {
+                // recurse
+                deleteFolderRecursive(curPath);
+            }
+            else {
+                // delete file
+                fs_1.default.unlinkSync(curPath);
+            }
+        });
+        fs_1.default.rmdirSync(path);
+    }
+};
+function createNewDir(dir) {
+    if (fs_1.default.existsSync(dir)) {
+        deleteFolderRecursive(dir);
+    }
     fs_1.default.mkdirSync(dir);
 }
-exports.saveImageUrlToDir = saveImageUrlToDir;
+exports.createNewDir = createNewDir;
+function downloadImage(uri, file) {
+    return new Promise((resolve, reject) => {
+        request_1.default.head(uri, function (err, res, body) {
+            request_1.default(uri)
+                .pipe(fs_1.default.createWriteStream(file))
+                .on("close", () => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve();
+                }
+            });
+        });
+    });
+}
+exports.downloadImage = downloadImage;
