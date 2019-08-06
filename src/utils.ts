@@ -1,5 +1,5 @@
 import constants from "./constants"
-export function delay(ms: number = constants.delayMillis) {
+export function delay(ms: number = constants.defaultDelayMillis) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 

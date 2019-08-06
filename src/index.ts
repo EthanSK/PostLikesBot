@@ -15,7 +15,7 @@ async function main() {
     const browser = await createBrowser()
     await createPage(browser)
     await login()
-    return await postLikes()
+    await postLikes()
 
     // const urls = await getLikes()
     // await mongooseConnect()

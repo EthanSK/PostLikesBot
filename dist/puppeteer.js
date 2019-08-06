@@ -24,7 +24,7 @@ async function createPage(browser) {
     const _page = await browser.newPage();
     await _page.setCacheEnabled(true);
     _page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"); //so we don't look like a bot
-    _page.setViewport({ width: 1500, height: 1500 });
+    _page.setViewport({ width: 1200, height: 1500 });
     exports.page = _page;
 }
 exports.createPage = createPage;

@@ -12,7 +12,7 @@ async function main() {
         const browser = await puppeteer_1.createBrowser();
         await puppeteer_1.createPage(browser);
         await puppeteer_1.login();
-        return await postLikes_1.default();
+        await postLikes_1.default();
         // const urls = await getLikes()
         // await mongooseConnect()
         // if (!urls) {

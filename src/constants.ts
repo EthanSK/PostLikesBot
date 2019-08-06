@@ -1,5 +1,5 @@
 const constants = {
-  delayMillis: 5000,
+  defaultDelayMillis: 5000,
   slowMo: 10,
   screenshotsDir: "./logs/screenshots",
 

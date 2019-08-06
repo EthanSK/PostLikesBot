@@ -32,13 +32,21 @@ async function uploadImage() {
     "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
   )
 
-  await button.click()
-  await button.click() //because it seems like the first click just highlights the section
-  // const fileChooser = await page.waitForFileChooser()
-
-  // fileChooser.accept(["./testImage.png"])
-
-  // await input!.uploadFile("./testImage.png")
-  // await page.click('[data-testid="react-composer-post-button"]')
+  async function triggerFileSelect() {
+    await button.click()
+    await delay(1000) //because rapid succession can fucc up
+    await button.click() //because it seems like the first click just highlights the section
+  }
+  const [fileChooser] = await Promise.all([
+    page.waitForFileChooser(),
+    triggerFileSelect()
+  ])
+  console.log("choosing image...")
+  await fileChooser.accept(["testImage.png"])
+  await delay()
+  // await page.screenshot({ path: "logs/screenshots/imagess.png" })
+  console.log("sharing image...")
+  await page.click('[data-testid="react-composer-post-button"]')
+  await delay(10000) //give it a good long delay so it can post the pic
   console.log("upload image done")
 }
