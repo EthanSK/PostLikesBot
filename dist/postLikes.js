@@ -18,19 +18,19 @@ async function goToFBPage() {
     console.log("at facebook page");
 }
 async function uploadImage() {
+    // await delay() //needed despite waitforselector hmmm
     await puppeteer_1.page.waitForSelector('[data-testid="photo-video-button"]');
-    await utils_1.delay(); //needed despite waitforselector hmmm
     await puppeteer_1.page.click('[data-testid="photo-video-button"]');
-    await utils_1.delay();
+    // await delay()
     //works until here
     // await page.waitForSelector('input[type="file"]')
     // const input = await page.$('input[type="file"]')
-    const [button] = await puppeteer_1.page.$x("//div[contains(text(), 'Upload Photos/Video')]");
-    await button.click();
+    await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Upload Photos/Video')]");
+    const [button] = await puppeteer_1.page.$x("//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
+    );
     await button.click();
     await button.click(); //because it seems like the first click just highlights the section
     // const fileChooser = await page.waitForFileChooser()
-    // await delay()
     // fileChooser.accept(["./testImage.png"])
     // await input!.uploadFile("./testImage.png")
     // await page.click('[data-testid="react-composer-post-button"]')

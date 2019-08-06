@@ -19,24 +19,23 @@ async function goToFBPage() {
 }
 
 async function uploadImage() {
+  // await delay() //needed despite waitforselector hmmm
   await page.waitForSelector('[data-testid="photo-video-button"]')
-  await delay() //needed despite waitforselector hmmm
   await page.click('[data-testid="photo-video-button"]')
-  await delay()
+  // await delay()
 
   //works until here
   // await page.waitForSelector('input[type="file"]')
   // const input = await page.$('input[type="file"]')
+  await page.waitForXPath("//div[contains(text(), 'Upload Photos/Video')]")
   const [button] = await page.$x(
-    "//div[contains(text(), 'Upload Photos/Video')]"
+    "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
   )
-  await button.click()
+
   await button.click()
   await button.click() //because it seems like the first click just highlights the section
-
   // const fileChooser = await page.waitForFileChooser()
 
-  // await delay()
   // fileChooser.accept(["./testImage.png"])
 
   // await input!.uploadFile("./testImage.png")
