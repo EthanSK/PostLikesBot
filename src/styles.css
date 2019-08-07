@@ -3,13 +3,74 @@
   src: url(../src/klavikaBold.otf);
 }
 
-h1 {
-  color: white;
+.title {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  height: 60px;
+  justify-content: center;
+  margin-top: -10px;
+  padding-top: 5px;
+}
+#slogan {
+  margin-top: -5px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+*:not(.title),
+*::after:not(.title),
+*::before:not(.title) {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+  cursor: default;
+}
+
+.reactIcons {
+  display: block;
+  max-height: 30px;
+  width: auto;
+  height: auto;
+  margin: 20px;
+}
+
+#reactIcons {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 50px;
 }
 
 body {
-  background-color: #1778f2;
+  background-color: #3b5998;
   font-family: klavika-bold;
   font-size: large;
-  text-align: center;
+  color: white;
+}
+
+.textBoxContainer {
+  display: flex;
+  background-color: transparent;
+  width: 50%;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+}
+/* 
+.texBoxLabel {
+} */
+.textBox {
+  width: 50%;
+}
+
+input[type="text"],
+input[type="password"] {
+  padding-left: 10px;
+  margin-left: 10px;
+  border: 0px;
+  border-radius: 15px;
+  height: 30px;
+  outline: 0px;
 }

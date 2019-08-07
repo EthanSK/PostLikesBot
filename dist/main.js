@@ -14,12 +14,15 @@ function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
         height: 700,
-        width: 900
+        width: 950,
+        minWidth: 650,
+        minHeight: 400,
+        titleBarStyle: "hiddenInset"
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    //   mainWindow.webContents.openDevTools()
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {
         // Dereference the window object, usually you would store windows
