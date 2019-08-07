@@ -12,7 +12,7 @@ const postLikes_1 = __importDefault(require("./postLikes"));
 const utils_1 = require("./utils");
 const path_1 = __importDefault(require("path"));
 const mongoose_2 = __importDefault(require("mongoose"));
-async function main() {
+async function run() {
     try {
         const browser = await puppeteer_1.createBrowser();
         await puppeteer_1.createPage(browser);
@@ -54,4 +54,4 @@ async function main() {
         console.error("error: ", error);
     }
 }
-main();
+// run()

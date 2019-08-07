@@ -4,9 +4,7 @@ import getLikedPosts from "./getLikes"
 import {
   mongooseConnect,
   saveNewDocToMongo,
-  checkIfPosted,
   checkIfDocExists,
-  updateIsPosted,
   getUnpostedPostUrls
 } from "./mongoose"
 import { createPage, createBrowser, page, login } from "./puppeteer"
@@ -14,7 +12,8 @@ import postLikes, { postMemePkg } from "./postLikes"
 import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
 import mongoose from "mongoose"
-async function main() {
+
+async function run() {
   try {
     const browser = await createBrowser()
 
@@ -59,4 +58,4 @@ async function main() {
   }
 }
 
-main()
+// run()

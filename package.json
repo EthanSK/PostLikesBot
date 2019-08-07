@@ -2,11 +2,12 @@
   "name": "postlikesbot",
   "version": "1.0.0",
   "description": "Bot",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "concurrently \"nodemon\" \"npm run tsWatch\"",
-    "start": "node .",
-    "tsWatch": "tsc -W"
+    "start": "electron .",
+    "tsWatch": "tsc -W",
+    "build": "tsc"
   },
   "author": "Ethan Sarif-Kattan",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "@types/dotenv": "^6.1.1",
     "@types/mongoose": "^5.5.11",
     "@types/puppeteer": "^1.19.0",
-    "@types/request": "^2.48.2"
+    "@types/request": "^2.48.2",
+    "electron": "^6.0.1"
   }
 }

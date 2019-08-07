@@ -1,0 +1,15 @@
+@font-face {
+  font-family: klavika-bold;
+  src: url(../src/klavikaBold.otf);
+}
+
+h1 {
+  color: white;
+}
+
+body {
+  background-color: #1778f2;
+  font-family: klavika-bold;
+  font-size: large;
+  text-align: center;
+}
