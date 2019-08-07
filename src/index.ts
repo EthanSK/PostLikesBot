@@ -7,7 +7,12 @@ import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
 import mongoose from "mongoose"
 import constants from "./constants"
-import { saveStoreIfNew, checkIfPosted } from "./electronStore"
+import {
+  saveStoreIfNew,
+  checkIfPosted,
+  updateIsPosted,
+  saveUserDefault
+} from "./electronStore"
 import { app } from "electron"
 
 export default async function run() {
@@ -26,6 +31,7 @@ export default async function run() {
     console.log("app data store: ", app.getPath("userData"))
     for (const url of urls) {
       saveStoreIfNew(url) //is sync
+      // updateIsPosted(true, url)
     }
     const unpostedUrls = urls.filter(url => !checkIfPosted(url))
     const imagesDir = "./temp"
@@ -50,5 +56,3 @@ export default async function run() {
     console.error("error: ", error)
   }
 }
-
-// run()

@@ -3,7 +3,8 @@ const constants = {
   slowMo: 10,
   screenshotsDir: "./logs/screenshots",
   databaseFile: "../db/postLikesBot.db",
-  mongoDatabaseName: "PostLikesBotDB"
+  mongoDatabaseName: "PostLikesBotDB",
+  appName: "Post Likes Bot"
 }
 
 export default constants

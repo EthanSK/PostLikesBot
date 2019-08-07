@@ -7,10 +7,11 @@
     "dev": "concurrently \"nodemon\" \"npm run tsWatch\"",
     "start": "electron .",
     "tsWatch": "tsc -W",
-    "build": "tsc"
+    "build": "tsc",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "author": "Ethan Sarif-Kattan",
-  "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "concurrently": "^4.1.1",
@@ -23,10 +24,25 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.12",
     "@types/dotenv": "^6.1.1",
+    "@types/electron-builder": "^2.8.0",
     "@types/electron-store": "^3.2.0",
     "@types/mongoose": "^5.5.11",
     "@types/puppeteer": "^1.19.0",
     "@types/request": "^2.48.2",
-    "electron": "^6.0.1"
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.ethansk.postlikesbot",
+    "productName": "Post Likes Bot",
+    "copyright": "Copyright © 2019 ${author}",
+    "directories": {
+      "buildResources": "build",
+      "output": "executables"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true
+    }
   }
 }

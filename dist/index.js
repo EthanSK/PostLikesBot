@@ -26,6 +26,7 @@ async function run() {
         console.log("app data store: ", electron_1.app.getPath("userData"));
         for (const url of urls) {
             electronStore_1.saveStoreIfNew(url); //is sync
+            // updateIsPosted(true, url)
         }
         const unpostedUrls = urls.filter(url => !electronStore_1.checkIfPosted(url));
         const imagesDir = "./temp";
@@ -52,4 +53,3 @@ async function run() {
     }
 }
 exports.default = run;
-// run()

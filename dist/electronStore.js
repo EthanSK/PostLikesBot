@@ -8,24 +8,32 @@ const utils_1 = require("./utils");
 const store = new electron_store_1.default();
 function saveStoreIfNew(postUrl) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
+    const fullKeyPath = `posts.${hashedKey}`;
     const toSave = {
         postUrl,
         isPosted: false
     };
-    if (!store.has(hashedKey)) {
-        store.set(hashedKey, toSave);
+    if (!store.has(fullKeyPath)) {
+        store.set(fullKeyPath, toSave);
     }
 }
 exports.saveStoreIfNew = saveStoreIfNew;
 function updateIsPosted(isPosted, postUrl) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    store.set(hashedKey + ".isPosted", isPosted);
+    const fullKeyPath = `posts.${hashedKey}.isPosted`;
+    store.set(fullKeyPath, isPosted);
 }
 exports.updateIsPosted = updateIsPosted;
 function checkIfPosted(postUrl) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const isPosted = store.get(hashedKey + ".isPosted");
+    const fullKeyPath = `posts.${hashedKey}.isPosted`;
+    const isPosted = store.get(fullKeyPath);
     console.log("isPosted: ", isPosted);
     return isPosted;
 }
 exports.checkIfPosted = checkIfPosted;
+function saveUserDefault(key, value) {
+    console.log("saving user default: ", key, value);
+    store.set(key, value);
+}
+exports.saveUserDefault = saveUserDefault;

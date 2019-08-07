@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
-const index_1 = __importDefault(require("./index"));
+const constants_1 = __importDefault(require("./constants"));
 let mainWindow;
 function createWindow() {
     // Create the browser window.
@@ -21,13 +21,17 @@ function createWindow() {
         width: 950,
         minWidth: 650,
         minHeight: 400,
-        titleBarStyle: "hiddenInset"
+        titleBarStyle: "hiddenInset",
+        title: constants_1.default.appName,
+        webPreferences: {
+            nodeIntegration: true //otherwise require dosen't work in html
+        }
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     // Open the DevTools.
-    //   mainWindow.webContents.openDevTools()
-    index_1.default();
+    mainWindow.webContents.openDevTools();
+    // run()
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {
         // Dereference the window object, usually you would store windows
@@ -36,6 +40,7 @@ function createWindow() {
         mainWindow = null;
     });
 }
+electron_1.app.setName(constants_1.default.appName);
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -57,3 +62,10 @@ electron_1.app.on("activate", () => {
 });
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+electron_1.ipcMain.on("facebokPageIdTextBoxChanged", function (event, data) {
+    console.log("ipc event triggered: ", data);
+    // saveUserDefault(
+    //   "facebookPageId",
+    //   document.getElementById("facebokPageIdTextBox")!.nodeValue!
+    // )
+});

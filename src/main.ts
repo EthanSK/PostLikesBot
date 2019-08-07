@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from "electron"
+import { app, BrowserWindow, ipcMain as ipc, dialog } from "electron"
 import * as path from "path"
 import run from "./index"
+import constants from "./constants"
 let mainWindow: Electron.BrowserWindow | null
 
 function createWindow() {
@@ -10,16 +11,20 @@ function createWindow() {
     width: 950,
     minWidth: 650,
     minHeight: 400,
-    titleBarStyle: "hiddenInset"
+    titleBarStyle: "hiddenInset",
+    title: constants.appName,
+    webPreferences: {
+      nodeIntegration: true //otherwise require dosen't work in html
+    }
   })
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "../public/index.html"))
 
   // Open the DevTools.
-  //   mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
-  run()
+  // run()
 
   // Emitted when the window is closed.
   mainWindow.on("closed", () => {
@@ -29,6 +34,8 @@ function createWindow() {
     mainWindow = null
   })
 }
+
+app.setName(constants.appName)
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -54,3 +61,11 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+ipc.on("facebokPageIdTextBoxChanged", function(event, data) {
+  console.log("ipc event triggered: ", data)
+  // saveUserDefault(
+  //   "facebookPageId",
+  //   document.getElementById("facebokPageIdTextBox")!.nodeValue!
+  // )
+})
