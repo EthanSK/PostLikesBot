@@ -10,10 +10,9 @@ import {
   getUnpostedPostUrls
 } from "./mongoose"
 import { createPage, createBrowser, page, login } from "./puppeteer"
-import postLikes from "./postLikes"
+import postLikes, { postMemePkg } from "./postLikes"
 import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
-import { postMemePkg } from "./postLikes"
 import mongoose from "mongoose"
 async function main() {
   try {
