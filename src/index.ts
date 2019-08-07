@@ -1,19 +1,16 @@
 import dotenv from "dotenv"
 dotenv.config()
 import getLikedPosts from "./getLikes"
-import {
-  mongooseConnect,
-  saveNewDocToMongo,
-  checkIfDocExists,
-  getUnpostedPostUrls
-} from "./mongoose"
 import { createPage, createBrowser, page, login } from "./puppeteer"
 import postLikes, { postMemePkg } from "./postLikes"
 import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
 import mongoose from "mongoose"
+import constants from "./constants"
+import { saveStoreIfNew, checkIfPosted } from "./electronStore"
+import { app } from "electron"
 
-async function run() {
+export default async function run() {
   try {
     const browser = await createBrowser()
 
@@ -22,20 +19,16 @@ async function run() {
     await login()
 
     const urls = await getLikedPosts()
-    await mongooseConnect()
+    // await mongooseConnect()
     if (!urls) {
       return
     }
+    console.log("app data store: ", app.getPath("userData"))
     for (const url of urls) {
-      const exists = await checkIfDocExists(url)
-      if (!exists) {
-        //so we don't overwrite the isposted data
-        // console.log("saving url to mongo: ", url)
-        await saveNewDocToMongo(url)
-      }
+      saveStoreIfNew(url) //is sync
     }
-    const unpostedUrls = await getUnpostedPostUrls()
-    const imagesDir = "./tmp"
+    const unpostedUrls = urls.filter(url => !checkIfPosted(url))
+    const imagesDir = "./temp"
     createNewDir(imagesDir)
     let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
@@ -51,8 +44,8 @@ async function run() {
     }
     await postLikes(memes)
     await mongoose.disconnect() //otherwise node never ends
+    await browser.close()
     console.log("finished!")
-    return await browser.close()
   } catch (error) {
     console.error("error: ", error)
   }

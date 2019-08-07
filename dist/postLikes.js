@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
 const utils_1 = require("./utils");
-const mongoose_1 = require("./mongoose");
+const electronStore_1 = require("./electronStore");
 const pageId = process.env.FACEBOOK_PAGE_ID;
 async function postLikes(memes) {
     try {
         await goToFBPage();
         for (const meme of memes) {
             await uploadImage(meme.file);
-            await mongoose_1.updateIsPosted(true, meme.postUrl);
+            await electronStore_1.updateIsPosted(true, meme.postUrl);
         }
     }
     catch (error) {

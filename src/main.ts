@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from "electron"
 import * as path from "path"
-
+import run from "./index"
 let mainWindow: Electron.BrowserWindow | null
 
 function createWindow() {
@@ -18,6 +18,8 @@ function createWindow() {
 
   // Open the DevTools.
   //   mainWindow.webContents.openDevTools()
+
+  run()
 
   // Emitted when the window is closed.
   mainWindow.on("closed", () => {

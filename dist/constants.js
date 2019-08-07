@@ -4,6 +4,7 @@ const constants = {
     defaultDelayMillis: 5000,
     slowMo: 10,
     screenshotsDir: "./logs/screenshots",
+    databaseFile: "../db/postLikesBot.db",
     mongoDatabaseName: "PostLikesBotDB"
 };
 exports.default = constants;

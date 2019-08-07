@@ -1,7 +1,6 @@
-import puppeteer from "puppeteer"
-import { createPage, createBrowser, page } from "./puppeteer"
+import { page } from "./puppeteer"
 import { fbPageURL, delay } from "./utils"
-import { updateIsPosted } from "./mongoose"
+import { updateIsPosted } from "./electronStore"
 
 const pageId = process.env.FACEBOOK_PAGE_ID
 

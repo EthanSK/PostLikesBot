@@ -6,9 +6,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
+const index_1 = __importDefault(require("./index"));
 let mainWindow;
 function createWindow() {
     // Create the browser window.
@@ -23,6 +27,7 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     // Open the DevTools.
     //   mainWindow.webContents.openDevTools()
+    index_1.default();
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {
         // Dereference the window object, usually you would store windows
