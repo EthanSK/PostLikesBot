@@ -2,11 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
 const utils_1 = require("./utils");
+const mongoose_1 = require("./mongoose");
 const pageId = process.env.FACEBOOK_PAGE_ID;
-async function postLikes() {
+async function postLikes(memes) {
     try {
         await goToFBPage();
-        // await uploadImage()
+        for (const meme of memes) {
+            await uploadImage(meme.file);
+            await mongoose_1.updateIsPosted(true, meme.postUrl);
+        }
     }
     catch (error) {
         console.error("error posting likes: ", error);
@@ -17,7 +21,7 @@ async function goToFBPage() {
     await puppeteer_1.page.goto(utils_1.fbPageURL(pageId));
     console.log("at facebook page");
 }
-async function uploadImage() {
+async function uploadImage(file) {
     // await delay() //needed despite waitforselector hmmm
     await puppeteer_1.page.waitForSelector('[data-testid="photo-video-button"]');
     await puppeteer_1.page.click('[data-testid="photo-video-button"]');
@@ -38,11 +42,11 @@ async function uploadImage() {
         triggerFileSelect()
     ]);
     console.log("choosing image...");
-    await fileChooser.accept(["testImage.png"]); //rel to project root
+    await fileChooser.accept([file]); //rel to project root
     await utils_1.delay();
     // await page.screenshot({ path: "logs/screenshots/imagess.png" })
     console.log("sharing image...");
     await puppeteer_1.page.click('[data-testid="react-composer-post-button"]');
-    await utils_1.delay(10000); //give it a good long delay so it can post the pic
+    await utils_1.delay(5000); //give it a good long delay so it can post the pic
     console.log("upload image done");
 }

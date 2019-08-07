@@ -41,11 +41,11 @@
     /* Module Resolution Options */
     // "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     // "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
-    "paths": {
-      "*": ["customTypes/*"]
-    },
+    // "paths": {
+    //   "*": ["customTypes/*"]
+    // },
 
-    "baseUrl": "./",
+    // "baseUrl": "./",
 
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [

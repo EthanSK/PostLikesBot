@@ -1,13 +1,22 @@
 import puppeteer from "puppeteer"
 import { createPage, createBrowser, page } from "./puppeteer"
 import { fbPageURL, delay } from "./utils"
+import { updateIsPosted } from "./mongoose"
 
 const pageId = process.env.FACEBOOK_PAGE_ID
 
-export default async function postLikes() {
+export interface postMemePkg {
+  postUrl: string
+  file: string
+}
+
+export default async function postLikes(memes: postMemePkg[]) {
   try {
     await goToFBPage()
-    // await uploadImage()
+    for (const meme of memes) {
+      await uploadImage(meme.file)
+      await updateIsPosted(true, meme.postUrl)
+    }
   } catch (error) {
     console.error("error posting likes: ", error)
   }
@@ -18,7 +27,7 @@ async function goToFBPage() {
   console.log("at facebook page")
 }
 
-async function uploadImage() {
+async function uploadImage(file: string) {
   // await delay() //needed despite waitforselector hmmm
   await page.waitForSelector('[data-testid="photo-video-button"]')
   await page.click('[data-testid="photo-video-button"]')
@@ -42,11 +51,11 @@ async function uploadImage() {
     triggerFileSelect()
   ])
   console.log("choosing image...")
-  await fileChooser.accept(["testImage.png"]) //rel to project root
+  await fileChooser.accept([file]) //rel to project root
   await delay()
   // await page.screenshot({ path: "logs/screenshots/imagess.png" })
   console.log("sharing image...")
   await page.click('[data-testid="react-composer-post-button"]')
-  await delay(10000) //give it a good long delay so it can post the pic
+  await delay(5000) //give it a good long delay so it can post the pic
   console.log("upload image done")
 }

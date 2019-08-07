@@ -13,47 +13,48 @@ import { createPage, createBrowser, page, login } from "./puppeteer"
 import postLikes from "./postLikes"
 import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
+import { postMemePkg } from "./postLikes"
+import mongoose from "mongoose"
 async function main() {
   try {
     const browser = await createBrowser()
+
     await createPage(browser)
+
     await login()
 
-    // const urls = await getLikedPosts()
+    const urls = await getLikedPosts()
     await mongooseConnect()
-    // if (!urls) {
-    //   return
-    // }
-    // for (const url of urls) {
-    //   const exists = await checkIfDocExists(url)
-    //   if (!exists) {
-    //     //so we don't overwrite the isposted data
-    //     // console.log("saving url to mongo: ", url)
-    //     await saveNewDocToMongo(url)
-    //   }
-    // }
+    if (!urls) {
+      return
+    }
+    for (const url of urls) {
+      const exists = await checkIfDocExists(url)
+      if (!exists) {
+        //so we don't overwrite the isposted data
+        // console.log("saving url to mongo: ", url)
+        await saveNewDocToMongo(url)
+      }
+    }
     const unpostedUrls = await getUnpostedPostUrls()
     const imagesDir = "./tmp"
     createNewDir(imagesDir)
-    let downloadTasks = []
-    let counter = 0
+    let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
       const imageUrl = await getImageUrl(postUrl)
+      const file = path.join(imagesDir, memes.length.toString() + ".png")
       if (imageUrl) {
-        downloadTasks.push(
-          downloadImage(
-            imageUrl,
-            path.join(imagesDir, counter.toString() + ".png")
-          )
-        )
+        await downloadImage(imageUrl, file)
+        memes.push({
+          postUrl,
+          file
+        })
       }
-      counter += 1
     }
-    // await Promise.all(downloadTasks)
-    return
-    await postLikes()
-
-    await browser.close()
+    await postLikes(memes)
+    await mongoose.disconnect() //otherwise node never ends
+    console.log("finished!")
+    return await browser.close()
   } catch (error) {
     console.error("error: ", error)
   }

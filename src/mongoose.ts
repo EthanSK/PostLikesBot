@@ -7,7 +7,6 @@ dotenv.config()
 
 const mongoUsername = process.env.MONGO_USERNAME
 const mongoPassword = process.env.MONGO_PASSWORD
-const maxNumToPostAtATime = process.env.MAX_NUMBER_TO_POST_AT_A_TIME
 let memeSchema = new mongoose.Schema({
   postUrl: { type: String, required: true, unique: true },
   isPosted: { type: Boolean, required: true },
@@ -56,6 +55,7 @@ export async function updateIsPosted(isPosted: boolean, postUrl: string) {
     isPosted: isPosted
   }
   await memeModel.updateOne({ postUrl }, { $set: obj }).exec()
+  console.log("updated isPosted in mongo")
 }
 
 export async function checkIfDocExists(postUrl: string): Promise<boolean> {

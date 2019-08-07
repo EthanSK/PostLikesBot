@@ -9,7 +9,6 @@ const constants_1 = __importDefault(require("./constants"));
 dotenv_1.default.config();
 const mongoUsername = process.env.MONGO_USERNAME;
 const mongoPassword = process.env.MONGO_PASSWORD;
-const maxNumToPostAtATime = process.env.MAX_NUMBER_TO_POST_AT_A_TIME;
 let memeSchema = new mongoose_1.default.Schema({
     postUrl: { type: String, required: true, unique: true },
     isPosted: { type: Boolean, required: true },
@@ -43,6 +42,7 @@ async function updateIsPosted(isPosted, postUrl) {
         isPosted: isPosted
     };
     await memeModel.updateOne({ postUrl }, { $set: obj }).exec();
+    console.log("updated isPosted in mongo");
 }
 exports.updateIsPosted = updateIsPosted;
 async function checkIfDocExists(postUrl) {
