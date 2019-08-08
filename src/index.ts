@@ -1,58 +1,43 @@
-import dotenv from "dotenv"
-dotenv.config()
-import getLikedPosts from "./getLikes"
-import { createPage, createBrowser, page, login } from "./puppeteer"
-import postLikes, { postMemePkg } from "./postLikes"
-import { getImageUrl, createNewDir, downloadImage } from "./utils"
-import path from "path"
-import mongoose from "mongoose"
-import constants from "./constants"
-import {
-  saveStoreIfNew,
-  checkIfPosted,
-  updateIsPosted,
-  saveUserDefault
-} from "./electronStore"
-import { app } from "electron"
+import { ipcRenderer as ipc } from "electron"
+import { UserDefaultsKey } from "./electronStore"
 
-export default async function run() {
-  try {
-    const browser = await createBrowser()
+export const UIElems: UserDefaultsKey[] = [
+  "facebookPageId",
+  "facebookProfileId",
+  "facebookEmail",
+  "facebookPassword"
+]
 
-    await createPage(browser)
+//REMEMBER - all console.log goes to app window
 
-    await login()
-
-    const urls = await getLikedPosts()
-    // await mongooseConnect()
-    if (!urls) {
-      return
+function listenToElementChanges(id: UserDefaultsKey) {
+  document.getElementById(id)!.onchange = function() {
+    console.log("element changed", id)
+    const data = {
+      id,
+      value: (document.getElementById(id) as HTMLInputElement)!.value
     }
-    console.log("app data store: ", app.getPath("userData"))
-    for (const url of urls) {
-      saveStoreIfNew(url) //is sync
-      // updateIsPosted(true, url)
-    }
-    const unpostedUrls = urls.filter(url => !checkIfPosted(url))
-    const imagesDir = "./temp"
-    createNewDir(imagesDir)
-    let memes: postMemePkg[] = []
-    for (const postUrl of unpostedUrls) {
-      const imageUrl = await getImageUrl(postUrl)
-      const file = path.join(imagesDir, memes.length.toString() + ".png")
-      if (imageUrl) {
-        await downloadImage(imageUrl, file)
-        memes.push({
-          postUrl,
-          file
-        })
-      }
-    }
-    await postLikes(memes)
-    await mongoose.disconnect() //otherwise node never ends
-    await browser.close()
-    console.log("finished!")
-  } catch (error) {
-    console.error("error: ", error)
+    ipc.send("ui-elem-changed", data)
   }
 }
+
+ipc.on("ui-elem-data-res", function(
+  event,
+  data: { id: UserDefaultsKey; value: any }
+) {
+  console.log("ui data response: ", data)
+  const elem = document.getElementById(data.id)
+  const elemAttr = elem!.getAttribute("type")
+  if (elemAttr === "text" || elemAttr === "password") {
+    ;(elem as HTMLInputElement).value = data.value
+  }
+})
+
+function setupUIElem(id: UserDefaultsKey) {
+  ipc.send("ui-elem-data-req", id)
+}
+
+UIElems.forEach(el => {
+  setupUIElem(el)
+  listenToElementChanges(el)
+})

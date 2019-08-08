@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
 const constants_1 = __importDefault(require("./constants"));
+const electronStore_1 = require("./electronStore");
 let mainWindow;
 function createWindow() {
     // Create the browser window.
@@ -62,10 +63,18 @@ electron_1.app.on("activate", () => {
 });
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-electron_1.ipcMain.on("facebokPageIdTextBoxChanged", function (event, data) {
-    console.log("ipc event triggered: ", data);
-    // saveUserDefault(
-    //   "facebookPageId",
-    //   document.getElementById("facebokPageIdTextBox")!.nodeValue!
-    // )
+electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
+    console.log("ipc UIElemChanged triggered on data: ", data);
+    electronStore_1.saveUserDefault(data.id, data.value);
+});
+electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
+    const res = {
+        id,
+        value: electronStore_1.getUserDefault(id)
+    };
+    console.log("res: ", res);
+    mainWindow.webContents.once("did-finish-load", function () {
+        console.log("did finish load");
+        event.sender.send("ui-elem-data-res", res);
+    });
 });

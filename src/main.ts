@@ -1,7 +1,13 @@
 import { app, BrowserWindow, ipcMain as ipc, dialog } from "electron"
 import * as path from "path"
-import run from "./index"
+import run from "./app"
 import constants from "./constants"
+import {
+  saveUserDefault,
+  UserDefaultsKey,
+  getUserDefault
+} from "./electronStore"
+
 let mainWindow: Electron.BrowserWindow | null
 
 function createWindow() {
@@ -62,10 +68,23 @@ app.on("activate", () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-ipc.on("facebokPageIdTextBoxChanged", function(event, data) {
-  console.log("ipc event triggered: ", data)
-  // saveUserDefault(
-  //   "facebookPageId",
-  //   document.getElementById("facebokPageIdTextBox")!.nodeValue!
-  // )
+ipc.on(`ui-elem-changed`, function(
+  event,
+  data: { id: UserDefaultsKey; value: any }
+) {
+  console.log("ipc UIElemChanged triggered on data: ", data)
+  saveUserDefault(data.id, data.value)
+})
+
+ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
+  const res = {
+    id,
+    value: getUserDefault(id)
+  }
+
+  console.log("res: ", res)
+  mainWindow!.webContents.once("did-finish-load", function() {
+    console.log("did finish load")
+    event.sender.send("ui-elem-data-res", res)
+  })
 })

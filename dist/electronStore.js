@@ -37,3 +37,8 @@ function saveUserDefault(key, value) {
     store.set(key, value);
 }
 exports.saveUserDefault = saveUserDefault;
+function getUserDefault(key) {
+    console.log("getting user default: ", key);
+    return store.get(key);
+}
+exports.getUserDefault = getUserDefault;

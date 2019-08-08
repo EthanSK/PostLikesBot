@@ -30,7 +30,7 @@ export function checkIfPosted(postUrl: string): boolean {
   return isPosted
 }
 
-type UserDefaultsKey =
+export type UserDefaultsKey =
   | "facebookPageId"
   | "facebookProfileId"
   | "facebookEmail"
@@ -39,4 +39,9 @@ type UserDefaultsKey =
 export function saveUserDefault(key: UserDefaultsKey, value: string) {
   console.log("saving user default: ", key, value)
   store.set(key, value)
+}
+
+export function getUserDefault(key: UserDefaultsKey): any {
+  console.log("getting user default: ", key)
+  return store.get(key)
 }
