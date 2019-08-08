@@ -14,30 +14,45 @@ const electronStore_1 = require("./electronStore");
 const electron_1 = require("electron");
 const main_1 = require("./main");
 let browser;
+async function closeBrowser() {
+    try {
+        await browser.close();
+        main_1.setIsStopping(false);
+    }
+    catch (error) {
+        console.error("error closing browser: ", error);
+    }
+}
+exports.closeBrowser = closeBrowser;
 async function stoppableRun() {
     main_1.sendToConsoleOutput("Started running at " + new Date());
     const iter = run();
     let resumeValue;
-    for (;;) {
-        if (main_1.startButtonState === "stateNotRunning") {
-            console.log("stopping run early");
-            main_1.sendToConsoleOutput("Stopped running early.");
-            await cleanup();
-            main_1.setIsStopping(false);
-            return;
+    try {
+        for (;;) {
+            if (main_1.startButtonState === "stateNotRunning") {
+                console.log("stopping run early");
+                main_1.sendToConsoleOutput("Stopped running early.");
+                await cleanup();
+                main_1.setIsStopping(false);
+                return;
+            }
+            const n = iter.next(resumeValue);
+            if (n.done) {
+                main_1.sendToConsoleOutput("Finished a run through!");
+                return n.value;
+            }
+            resumeValue = await n.value;
         }
-        const n = iter.next(resumeValue);
-        if (n.done) {
-            main_1.sendToConsoleOutput("Finished a run through!");
-            return n.value;
-        }
-        resumeValue = await n.value;
+    }
+    catch (error) {
+        console.error("error stoppableRun: ", error);
     }
 }
 exports.default = stoppableRun;
 async function cleanup() {
     if (browser) {
-        browser.close();
+        await browser.close();
     }
 }
 function* run() {

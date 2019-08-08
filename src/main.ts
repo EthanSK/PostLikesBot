@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain as ipc, dialog } from "electron"
 import * as path from "path"
 import constants from "./constants"
 import { userDefaults, UserDefaultsKey } from "./userDefaults"
-import stoppableRun from "./app"
+import stoppableRun, { closeBrowser } from "./app"
 let mainWindow: Electron.BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
 let isStopping: boolean = false
@@ -98,11 +98,12 @@ ipc.on("start-running-req", async function(event, data) {
   }
 })
 
-ipc.on("stop-running-req", function(event, data) {
+ipc.on("stop-running-req", async function(event, data) {
   console.log("orders to stop running")
   setIsStopping(true)
   startButtonState = "stateNotRunning"
   event.sender.send("start-state-res", startButtonState)
+  await closeBrowser()
 })
 
 export function sendToConsoleOutput(text: string) {

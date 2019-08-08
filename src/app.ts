@@ -17,31 +17,43 @@ import { startButtonState, sendToConsoleOutput, setIsStopping } from "./main"
 import { Browser } from "puppeteer"
 
 let browser: Browser
+export async function closeBrowser() {
+  try {
+    await browser.close()
+    setIsStopping(false)
+  } catch (error) {
+    console.error("error closing browser: ", error)
+  }
+}
 
 export default async function stoppableRun() {
   sendToConsoleOutput("Started running at " + new Date())
   const iter = run()
   let resumeValue
-  for (;;) {
-    if (startButtonState === "stateNotRunning") {
-      console.log("stopping run early")
-      sendToConsoleOutput("Stopped running early.")
-      await cleanup()
-      setIsStopping(false)
-      return
+  try {
+    for (;;) {
+      if (startButtonState === "stateNotRunning") {
+        console.log("stopping run early")
+        sendToConsoleOutput("Stopped running early.")
+        await cleanup()
+        setIsStopping(false)
+        return
+      }
+      const n = iter.next(resumeValue)
+      if (n.done) {
+        sendToConsoleOutput("Finished a run through!")
+        return n.value
+      }
+      resumeValue = await n.value
     }
-    const n = iter.next(resumeValue)
-    if (n.done) {
-      sendToConsoleOutput("Finished a run through!")
-      return n.value
-    }
-    resumeValue = await n.value
+  } catch (error) {
+    console.error("error stoppableRun: ", error)
   }
 }
 
 async function cleanup() {
   if (browser) {
-    browser.close()
+    await browser.close()
   }
 }
 
