@@ -1,6 +1,7 @@
 import Store from "electron-store"
 import { hashIntFromString } from "./utils"
 const store = new Store()
+import { UserDefaultsKey } from "./userDefaults"
 
 export function saveStoreIfNew(postUrl: string) {
   const hashedKey = hashIntFromString(postUrl).toString() //so the key is guaranteed valid json
@@ -29,12 +30,6 @@ export function checkIfPosted(postUrl: string): boolean {
   console.log("isPosted: ", isPosted)
   return isPosted
 }
-
-export type UserDefaultsKey =
-  | "facebookPageId"
-  | "facebookProfileId"
-  | "facebookEmail"
-  | "facebookPassword"
 
 export function saveUserDefault(key: UserDefaultsKey, value: string) {
   console.log("saving user default: ", key, value)

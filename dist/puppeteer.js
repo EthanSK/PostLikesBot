@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const constants_1 = __importDefault(require("./constants"));
 const utils_1 = require("./utils");
-const email = process.env.FACEBOOK_EMAIL;
-const password = process.env.FACEBOOK_PASSWORD;
-const profileId = process.env.FACEBOOK_PROFILE_ID;
-const shouldShowHead = process.env.SHOW_PUPPETEER_HEAD === "true" ? true : false;
-const pageId = process.env.FACEBOOK_PAGE_ID;
+const userDefaults_1 = require("./userDefaults");
 async function createBrowser() {
+    let headless = true;
+    if (userDefaults_1.userDefaults.get("shouldShowPuppeteerHead")) {
+        headless = false;
+    }
     const browser = await puppeteer_1.default.launch({
-        headless: !shouldShowHead,
+        headless: headless,
         slowMo: constants_1.default.slowMo,
         args: ["--no-sandbox", "--disable-notifications"] //chromium notifs get in the way when in non headless mode
     });
@@ -29,18 +29,21 @@ async function createPage(browser) {
 }
 exports.createPage = createPage;
 async function login() {
-    if (!email || !password || !profileId || !pageId) {
-        throw new Error("email or password or profileId or pageId env vars not set");
+    if (!userDefaults_1.userDefaults.get("facebookEmail") ||
+        !userDefaults_1.userDefaults.get("facebookPassword") ||
+        !userDefaults_1.userDefaults.get("facebookProfileId") ||
+        !userDefaults_1.userDefaults.get("facebookPageId")) {
+        throw new Error("email or password or profileId or pageId not set");
     }
-    await exports.page.goto(utils_1.likesPageURL(profileId));
+    await exports.page.goto(utils_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await exports.page.waitForSelector("#email");
-    await exports.page.type("#email", email);
-    await exports.page.type("#pass", password);
+    await exports.page.type("#email", userDefaults_1.userDefaults.get("facebookEmail"));
+    await exports.page.type("#pass", userDefaults_1.userDefaults.get("facebookPassword"));
     await exports.page.click("#loginbutton");
     await exports.page.waitForNavigation();
     if ((await exports.page.$("#login_form")) !== null) {
         //error logging in, prolly coz cookies thing
-        await exports.page.type("#pass", password);
+        await exports.page.type("#pass", userDefaults_1.userDefaults.get("facebookPassword"));
         await exports.page.click("#loginbutton");
     }
     console.log("login done");

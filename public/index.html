@@ -21,9 +21,12 @@
     </div>
 
     <h3 id="slogan">
-      Automatically posts images (originally posted by pages) you react to
-      directly to your own facebook page!
+      Automatically posts to your facebook page the image posts you reacted to
+      from other pages!
     </h3>
+
+    <textarea class="console" placeholder="Output"></textarea>
+
     <div class="textBoxContainer">
       <label class="textBoxLabel" for="facebookPageId">facebook page ID</label>
       <input
@@ -66,6 +69,35 @@
       />
     </div>
 
+    <div class="checkBoxContainer">
+      <label class="checkBoxLabel" for="shouldShowPuppeteerHead"></label>
+      <input type="checkbox" class="checkBox" id="shouldShowPuppeteerHead" />
+      Show behind-the-scenes<br />
+    </div>
+
+    <div class="checkBoxContainer">
+      <label class="checkBoxLabel" for="shouldStartRunningWhenAppOpens"></label>
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldStartRunningWhenAppOpens"
+      />
+      Start running when app opens<br />
+    </div>
+    <div class="checkBoxContainer">
+      <label class="checkBoxLabel" for="shouldSkipCurrentlyLikedPosts"></label>
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldSkipCurrentlyLikedPosts"
+      />
+      Skip all currently liked/reacted posts<br />
+    </div>
+    <div class="checkBoxContainer">
+      <label class="checkBoxLabel" for="shouldOpenAtLogin"></label>
+      <input type="checkbox" class="checkBox" id="shouldOpenAtLogin" />
+      Open app at login<br />
+    </div>
     <script>
       require("../dist/index")
     </script>

@@ -1,8 +1,8 @@
 import { page } from "./puppeteer"
 import { fbPageURL, delay } from "./utils"
 import { updateIsPosted } from "./electronStore"
-
-const pageId = process.env.FACEBOOK_PAGE_ID
+import constants from "./constants"
+import { userDefaults } from "./userDefaults"
 
 export interface postMemePkg {
   postUrl: string
@@ -22,7 +22,7 @@ export default async function postLikes(memes: postMemePkg[]) {
 }
 
 async function goToFBPage() {
-  await page.goto(fbPageURL(pageId!))
+  await page.goto(fbPageURL(userDefaults.get("facebookPageId")))
   console.log("at facebook page")
 }
 

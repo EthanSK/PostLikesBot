@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
 const utils_1 = require("./utils");
 const electronStore_1 = require("./electronStore");
-const pageId = process.env.FACEBOOK_PAGE_ID;
+const userDefaults_1 = require("./userDefaults");
 async function postLikes(memes) {
     try {
         await goToFBPage();
@@ -18,7 +18,7 @@ async function postLikes(memes) {
 }
 exports.default = postLikes;
 async function goToFBPage() {
-    await puppeteer_1.page.goto(utils_1.fbPageURL(pageId));
+    await puppeteer_1.page.goto(utils_1.fbPageURL(userDefaults_1.userDefaults.get("facebookPageId")));
     console.log("at facebook page");
 }
 async function uploadImage(file) {

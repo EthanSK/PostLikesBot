@@ -13,15 +13,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
 const constants_1 = __importDefault(require("./constants"));
-const electronStore_1 = require("./electronStore");
+const userDefaults_1 = require("./userDefaults");
 let mainWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
-        height: 700,
-        width: 950,
+        height: 650,
+        width: 650,
+        minHeight: 650,
         minWidth: 650,
-        minHeight: 400,
         titleBarStyle: "hiddenInset",
         title: constants_1.default.appName,
         webPreferences: {
@@ -31,8 +31,10 @@ function createWindow() {
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
-    // run()
+    // mainWindow.webContents.openDevTools()
+    mainWindow.webContents.once("did-finish-load", function () {
+        // run() //need a start button.
+    });
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {
         // Dereference the window object, usually you would store windows
@@ -42,6 +44,10 @@ function createWindow() {
     });
 }
 electron_1.app.setName(constants_1.default.appName);
+electron_1.app.setLoginItemSettings({
+    openAtLogin: userDefaults_1.userDefaults.get("shouldOpenAtLogin"),
+    path: electron_1.app.getPath("exe") //option only applies on windows
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -65,12 +71,12 @@ electron_1.app.on("activate", () => {
 // code. You can also put them in separate files and require them here.
 electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
     console.log("ipc UIElemChanged triggered on data: ", data);
-    electronStore_1.saveUserDefault(data.id, data.value);
+    userDefaults_1.userDefaults.set(data.id, data.value);
 });
 electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
     const res = {
         id,
-        value: electronStore_1.getUserDefault(id)
+        value: userDefaults_1.userDefaults.get(id)
     };
     console.log("res: ", res);
     mainWindow.webContents.once("did-finish-load", function () {

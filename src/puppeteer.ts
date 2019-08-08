@@ -1,19 +1,17 @@
 import puppeteer from "puppeteer"
 import constants from "./constants"
 import { delay, likesPageURL } from "./utils"
-
-const email = process.env.FACEBOOK_EMAIL
-const password = process.env.FACEBOOK_PASSWORD
-const profileId = process.env.FACEBOOK_PROFILE_ID
-const shouldShowHead: boolean =
-  process.env.SHOW_PUPPETEER_HEAD === "true" ? true : false
-const pageId = process.env.FACEBOOK_PAGE_ID
+import { userDefaults } from "./userDefaults"
 
 export let page: puppeteer.Page
 
 export async function createBrowser() {
+  let headless = true
+  if (userDefaults.get("shouldShowPuppeteerHead")) {
+    headless = false
+  }
   const browser = await puppeteer.launch({
-    headless: !shouldShowHead,
+    headless: headless,
     slowMo: constants.slowMo,
     args: ["--no-sandbox", "--disable-notifications"] //chromium notifs get in the way when in non headless mode
   })
@@ -31,18 +29,23 @@ export async function createPage(browser: puppeteer.Browser) {
 }
 
 export async function login() {
-  if (!email || !password || !profileId || !pageId) {
-    throw new Error("email or password or profileId or pageId env vars not set")
+  if (
+    !userDefaults.get("facebookEmail") ||
+    !userDefaults.get("facebookPassword") ||
+    !userDefaults.get("facebookProfileId") ||
+    !userDefaults.get("facebookPageId")
+  ) {
+    throw new Error("email or password or profileId or pageId not set")
   }
-  await page.goto(likesPageURL(profileId!))
+  await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
   await page.waitForSelector("#email")
-  await page.type("#email", email!)
-  await page.type("#pass", password!)
+  await page.type("#email", userDefaults.get("facebookEmail"))
+  await page.type("#pass", userDefaults.get("facebookPassword"))
   await page.click("#loginbutton")
   await page.waitForNavigation()
   if ((await page.$("#login_form")) !== null) {
     //error logging in, prolly coz cookies thing
-    await page.type("#pass", password!)
+    await page.type("#pass", userDefaults.get("facebookPassword"))
     await page.click("#loginbutton")
   }
   console.log("login done")

@@ -1,11 +1,15 @@
 import { ipcRenderer as ipc } from "electron"
-import { UserDefaultsKey } from "./electronStore"
+import { UserDefaultsKey } from "./userDefaults"
 
 export const UIElems: UserDefaultsKey[] = [
   "facebookPageId",
   "facebookProfileId",
   "facebookEmail",
-  "facebookPassword"
+  "facebookPassword",
+  "shouldShowPuppeteerHead",
+  "shouldStartRunningWhenAppOpens",
+  "shouldSkipCurrentlyLikedPosts",
+  "shouldOpenAtLogin"
 ]
 
 //REMEMBER - all console.log goes to app window
@@ -13,9 +17,18 @@ export const UIElems: UserDefaultsKey[] = [
 function listenToElementChanges(id: UserDefaultsKey) {
   document.getElementById(id)!.onchange = function() {
     console.log("element changed", id)
+    const elem = document.getElementById(id)
+    const elemType = elem!.getAttribute("type")
+    let value: any
+    if (elemType === "text" || elemType === "password") {
+      value = (elem as HTMLInputElement).value
+    } else if (elemType === "checkbox") {
+      value = (elem as HTMLInputElement).checked
+      console.log("but the value is ", value)
+    }
     const data = {
       id,
-      value: (document.getElementById(id) as HTMLInputElement)!.value
+      value
     }
     ipc.send("ui-elem-changed", data)
   }
@@ -27,9 +40,11 @@ ipc.on("ui-elem-data-res", function(
 ) {
   console.log("ui data response: ", data)
   const elem = document.getElementById(data.id)
-  const elemAttr = elem!.getAttribute("type")
-  if (elemAttr === "text" || elemAttr === "password") {
+  const elemType = elem!.getAttribute("type")
+  if (elemType === "text" || elemType === "password") {
     ;(elem as HTMLInputElement).value = data.value
+  } else if (elemType === "checkbox") {
+    ;(elem as HTMLInputElement).checked = data.value
   }
 })
 

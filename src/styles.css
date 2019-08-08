@@ -17,6 +17,20 @@
   margin-top: -5px;
   text-align: center;
   margin-bottom: 30px;
+  font-size: 23px;
+}
+
+.console {
+  float: right;
+  width: 30%;
+  height: 70vh;
+  border-radius: 15px;
+  border: 0px;
+  outline: 0px;
+  padding-left: 10px;
+  margin-left: 10px;
+  resize: none;
+  margin-top: -2px;
 }
 
 *:not(.title),
@@ -73,5 +87,19 @@ input[type="password"] {
   border: 0px;
   border-radius: 15px;
   height: 30px;
+  outline: 0px;
+}
+
+.checkBox {
+  margin-top: 10px;
+  margin-left: 30px;
+}
+
+input[type="checkbox"] {
+  zoom: 2.5;
+  position: relative;
+  top: 2.5px;
+  border: 0px;
+  background-color: white;
   outline: 0px;
 }

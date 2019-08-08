@@ -2,8 +2,7 @@ import puppeteer from "puppeteer"
 import { delay, likesPageURL } from "./utils"
 import constants from "./constants"
 import { createPage, createBrowser, page } from "./puppeteer"
-
-const profileId = process.env.FACEBOOK_PROFILE_ID
+import { userDefaults } from "./userDefaults"
 
 export default async function getLikedPosts() {
   try {
@@ -16,7 +15,7 @@ export default async function getLikedPosts() {
 }
 
 async function goToLikesPage() {
-  await page.goto(likesPageURL(profileId!))
+  await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
   await page.waitForSelector("#facebook")
   console.log("at likes page")
 }

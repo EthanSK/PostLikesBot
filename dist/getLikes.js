@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 const puppeteer_1 = require("./puppeteer");
-const profileId = process.env.FACEBOOK_PROFILE_ID;
+const userDefaults_1 = require("./userDefaults");
 async function getLikedPosts() {
     try {
         await goToLikesPage();
@@ -15,7 +15,7 @@ async function getLikedPosts() {
 }
 exports.default = getLikedPosts;
 async function goToLikesPage() {
-    await puppeteer_1.page.goto(utils_1.likesPageURL(profileId));
+    await puppeteer_1.page.goto(utils_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await puppeteer_1.page.waitForSelector("#facebook");
     console.log("at likes page");
 }
