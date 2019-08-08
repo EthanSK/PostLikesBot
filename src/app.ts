@@ -17,56 +17,30 @@ import { startButtonState, sendToConsoleOutput, setIsStopping } from "./main"
 import { Browser } from "puppeteer"
 
 let browser: Browser
-export async function closeBrowser() {
+
+export async function cleanup() {
   try {
-    await browser.close()
-    setIsStopping(false)
+    if (browser) {
+      await browser.close()
+    }
+    setIsStopping(false) //because now we are finished the stopping process
   } catch (error) {
     console.error("error closing browser: ", error)
   }
 }
 
-export default async function stoppableRun() {
+export async function run() {
+  //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
   sendToConsoleOutput("Started running at " + new Date())
-  const iter = run()
-  let resumeValue
+
   try {
-    for (;;) {
-      if (startButtonState === "stateNotRunning") {
-        console.log("stopping run early")
-        sendToConsoleOutput("Stopped running early.")
-        await cleanup()
-        setIsStopping(false)
-        return
-      }
-      const n = iter.next(resumeValue)
-      if (n.done) {
-        sendToConsoleOutput("Finished a run through!")
-        return n.value
-      }
-      resumeValue = await n.value
-    }
-  } catch (error) {
-    console.error("error stoppableRun: ", error)
-  }
-}
+    browser = await createBrowser()
 
-async function cleanup() {
-  if (browser) {
-    await browser.close()
-  }
-}
+    await createPage(browser)
 
-function* run() {
-  //is a generator, the yield is like pause points that allow us to, to a good degree, stop the function before the next yield
-  try {
-    browser = yield createBrowser()
+    await login()
 
-    yield createPage(browser)
-
-    yield login()
-
-    const urls: string[] = yield getLikedPosts()
+    const urls = await getLikedPosts()
     if (!urls) {
       return
     }
@@ -79,22 +53,22 @@ function* run() {
     createNewDir(imagesDir)
     let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
-      const imageUrl = yield getImageUrl(postUrl)
+      const imageUrl = await getImageUrl(postUrl)
       const file = path.join(imagesDir, memes.length.toString() + ".png")
       if (imageUrl) {
-        yield downloadImage(imageUrl, file)
+        await downloadImage(imageUrl, file)
         memes.push({
           postUrl,
           file
         })
       }
     }
-    yield postLikes(memes)
-    yield cleanup()
+    await postLikes(memes)
+    await cleanup()
     console.log("finished!")
     return
   } catch (error) {
-    console.error("error: ", error)
+    console.error("error run(): ", error)
     return
   }
 }

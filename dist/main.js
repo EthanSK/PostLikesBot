@@ -14,7 +14,7 @@ const electron_1 = require("electron");
 const path = __importStar(require("path"));
 const constants_1 = __importDefault(require("./constants"));
 const userDefaults_1 = require("./userDefaults");
-const app_1 = __importStar(require("./app"));
+const app_1 = require("./app");
 let mainWindow;
 let isStopping = false;
 function createWindow() {
@@ -90,7 +90,7 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
     if (!isStopping) {
         exports.startButtonState = "stateRunning";
         event.sender.send("start-state-res", exports.startButtonState);
-        await app_1.default();
+        await app_1.run();
     }
     else {
         sendToConsoleOutput("Cannot start, still stopping");
@@ -99,9 +99,11 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
 electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
+    sendToConsoleOutput("Stopping...");
+    await app_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
-    await app_1.closeBrowser();
+    sendToConsoleOutput("Stopped running early.");
 });
 function sendToConsoleOutput(text) {
     mainWindow.webContents.send("console-output", text);

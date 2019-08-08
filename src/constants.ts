@@ -5,7 +5,7 @@ const constants = {
   databaseFile: "../db/postLikesBot.db",
   mongoDatabaseName: "PostLikesBotDB",
   appName: "Post Likes Bot",
-  maxConsoleOutputChars: 1000
+  maxConsoleOutputChars: 10000
 }
 
 export default constants

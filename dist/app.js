@@ -14,54 +14,26 @@ const electronStore_1 = require("./electronStore");
 const electron_1 = require("electron");
 const main_1 = require("./main");
 let browser;
-async function closeBrowser() {
+async function cleanup() {
     try {
-        await browser.close();
-        main_1.setIsStopping(false);
+        if (browser) {
+            await browser.close();
+        }
+        main_1.setIsStopping(false); //because now we are finished the stopping process
     }
     catch (error) {
         console.error("error closing browser: ", error);
     }
 }
-exports.closeBrowser = closeBrowser;
-async function stoppableRun() {
+exports.cleanup = cleanup;
+async function run() {
+    //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
     main_1.sendToConsoleOutput("Started running at " + new Date());
-    const iter = run();
-    let resumeValue;
     try {
-        for (;;) {
-            if (main_1.startButtonState === "stateNotRunning") {
-                console.log("stopping run early");
-                main_1.sendToConsoleOutput("Stopped running early.");
-                await cleanup();
-                main_1.setIsStopping(false);
-                return;
-            }
-            const n = iter.next(resumeValue);
-            if (n.done) {
-                main_1.sendToConsoleOutput("Finished a run through!");
-                return n.value;
-            }
-            resumeValue = await n.value;
-        }
-    }
-    catch (error) {
-        console.error("error stoppableRun: ", error);
-    }
-}
-exports.default = stoppableRun;
-async function cleanup() {
-    if (browser) {
-        await browser.close();
-    }
-}
-function* run() {
-    //is a generator, the yield is like pause points that allow us to, to a good degree, stop the function before the next yield
-    try {
-        browser = yield puppeteer_1.createBrowser();
-        yield puppeteer_1.createPage(browser);
-        yield puppeteer_1.login();
-        const urls = yield getLikes_1.default();
+        browser = await puppeteer_1.createBrowser();
+        await puppeteer_1.createPage(browser);
+        await puppeteer_1.login();
+        const urls = await getLikes_1.default();
         if (!urls) {
             return;
         }
@@ -74,23 +46,24 @@ function* run() {
         utils_1.createNewDir(imagesDir);
         let memes = [];
         for (const postUrl of unpostedUrls) {
-            const imageUrl = yield utils_1.getImageUrl(postUrl);
+            const imageUrl = await utils_1.getImageUrl(postUrl);
             const file = path_1.default.join(imagesDir, memes.length.toString() + ".png");
             if (imageUrl) {
-                yield utils_1.downloadImage(imageUrl, file);
+                await utils_1.downloadImage(imageUrl, file);
                 memes.push({
                     postUrl,
                     file
                 });
             }
         }
-        yield postLikes_1.default(memes);
-        yield cleanup();
+        await postLikes_1.default(memes);
+        await cleanup();
         console.log("finished!");
         return;
     }
     catch (error) {
-        console.error("error: ", error);
+        console.error("error run(): ", error);
         return;
     }
 }
+exports.run = run;
