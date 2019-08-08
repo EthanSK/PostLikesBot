@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
-const app_1 = __importDefault(require("./app"));
 const constants_1 = __importDefault(require("./constants"));
 const userDefaults_1 = require("./userDefaults");
+const app_1 = __importDefault(require("./app"));
 let mainWindow;
+let isStopping = false;
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
@@ -84,12 +85,28 @@ electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
         event.sender.send("ui-elem-data-res", res);
     });
 });
-electron_1.ipcMain.on("start-running", async function (event, data) {
-    console.log("orders to start running boss");
-    exports.startButtonState = "stateRunning";
-    await app_1.default();
+electron_1.ipcMain.on("start-running-req", async function (event, data) {
+    console.log("orders to start running boss, isStopping: ", isStopping);
+    if (!isStopping) {
+        exports.startButtonState = "stateRunning";
+        event.sender.send("start-state-res", exports.startButtonState);
+        await app_1.default();
+    }
+    else {
+        sendToConsoleOutput("Cannot start, still stopping");
+    }
 });
-electron_1.ipcMain.on("stop-running", function (event, data) {
+electron_1.ipcMain.on("stop-running-req", function (event, data) {
     console.log("orders to stop running");
+    setIsStopping(true);
     exports.startButtonState = "stateNotRunning";
+    event.sender.send("start-state-res", exports.startButtonState);
 });
+function sendToConsoleOutput(text) {
+    mainWindow.webContents.send("console-output", text);
+}
+exports.sendToConsoleOutput = sendToConsoleOutput;
+function setIsStopping(to) {
+    isStopping = to;
+}
+exports.setIsStopping = setIsStopping;

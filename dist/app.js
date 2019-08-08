@@ -10,40 +10,49 @@ const puppeteer_1 = require("./puppeteer");
 const postLikes_1 = __importDefault(require("./postLikes"));
 const utils_1 = require("./utils");
 const path_1 = __importDefault(require("path"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const electronStore_1 = require("./electronStore");
 const electron_1 = require("electron");
 const main_1 = require("./main");
+let browser;
 async function stoppableRun() {
+    main_1.sendToConsoleOutput("Started running at " + new Date());
     const iter = run();
     let resumeValue;
     for (;;) {
         if (main_1.startButtonState === "stateNotRunning") {
             console.log("stopping run early");
+            main_1.sendToConsoleOutput("Stopped running early.");
+            await cleanup();
+            main_1.setIsStopping(false);
             return;
         }
         const n = iter.next(resumeValue);
         if (n.done) {
+            main_1.sendToConsoleOutput("Finished a run through!");
             return n.value;
         }
         resumeValue = await n.value;
     }
 }
 exports.default = stoppableRun;
+async function cleanup() {
+    if (browser) {
+        browser.close();
+    }
+}
 function* run() {
+    //is a generator, the yield is like pause points that allow us to, to a good degree, stop the function before the next yield
     try {
-        const browser = yield puppeteer_1.createBrowser();
+        browser = yield puppeteer_1.createBrowser();
         yield puppeteer_1.createPage(browser);
         yield puppeteer_1.login();
         const urls = yield getLikes_1.default();
-        // await mongooseConnect()
         if (!urls) {
             return;
         }
         console.log("app data store: ", electron_1.app.getPath("userData"));
         for (const url of urls) {
             electronStore_1.saveStoreIfNew(url); //is sync
-            // updateIsPosted(true, url)
         }
         const unpostedUrls = urls.filter(url => !electronStore_1.checkIfPosted(url));
         const imagesDir = "./temp";
@@ -61,8 +70,7 @@ function* run() {
             }
         }
         yield postLikes_1.default(memes);
-        yield mongoose_1.default.disconnect(); //otherwise node never ends
-        yield browser.close();
+        yield cleanup();
         console.log("finished!");
         return;
     }

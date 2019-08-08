@@ -5,7 +5,6 @@ import { createPage, createBrowser, page, login } from "./puppeteer"
 import postLikes, { postMemePkg } from "./postLikes"
 import { getImageUrl, createNewDir, downloadImage } from "./utils"
 import path from "path"
-import mongoose from "mongoose"
 import constants from "./constants"
 import {
   saveStoreIfNew,
@@ -14,41 +13,54 @@ import {
   saveUserDefault
 } from "./electronStore"
 import { app } from "electron"
-import { startButtonState } from "./main"
+import { startButtonState, sendToConsoleOutput, setIsStopping } from "./main"
+import { Browser } from "puppeteer"
+
+let browser: Browser
 
 export default async function stoppableRun() {
+  sendToConsoleOutput("Started running at " + new Date())
   const iter = run()
   let resumeValue
   for (;;) {
     if (startButtonState === "stateNotRunning") {
       console.log("stopping run early")
+      sendToConsoleOutput("Stopped running early.")
+      await cleanup()
+      setIsStopping(false)
       return
     }
     const n = iter.next(resumeValue)
     if (n.done) {
+      sendToConsoleOutput("Finished a run through!")
       return n.value
     }
     resumeValue = await n.value
   }
 }
 
+async function cleanup() {
+  if (browser) {
+    browser.close()
+  }
+}
+
 function* run() {
+  //is a generator, the yield is like pause points that allow us to, to a good degree, stop the function before the next yield
   try {
-    const browser = yield createBrowser()
+    browser = yield createBrowser()
 
     yield createPage(browser)
 
     yield login()
 
     const urls: string[] = yield getLikedPosts()
-    // await mongooseConnect()
     if (!urls) {
       return
     }
     console.log("app data store: ", app.getPath("userData"))
     for (const url of urls) {
       saveStoreIfNew(url) //is sync
-      // updateIsPosted(true, url)
     }
     const unpostedUrls = urls.filter(url => !checkIfPosted(url))
     const imagesDir = "./temp"
@@ -66,8 +78,7 @@ function* run() {
       }
     }
     yield postLikes(memes)
-    yield mongoose.disconnect() //otherwise node never ends
-    yield browser.close()
+    yield cleanup()
     console.log("finished!")
     return
   } catch (error) {

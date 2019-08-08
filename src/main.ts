@@ -1,11 +1,11 @@
 import { app, BrowserWindow, ipcMain as ipc, dialog } from "electron"
 import * as path from "path"
-import run from "./app"
 import constants from "./constants"
 import { userDefaults, UserDefaultsKey } from "./userDefaults"
+import stoppableRun from "./app"
 let mainWindow: Electron.BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
-
+let isStopping: boolean = false
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -87,13 +87,28 @@ ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
   })
 })
 
-ipc.on("start-running", async function(event, data) {
-  console.log("orders to start running boss")
-  startButtonState = "stateRunning"
-  await run()
+ipc.on("start-running-req", async function(event, data) {
+  console.log("orders to start running boss, isStopping: ", isStopping)
+  if (!isStopping) {
+    startButtonState = "stateRunning"
+    event.sender.send("start-state-res", startButtonState)
+    await stoppableRun()
+  } else {
+    sendToConsoleOutput("Cannot start, still stopping")
+  }
 })
 
-ipc.on("stop-running", function(event, data) {
+ipc.on("stop-running-req", function(event, data) {
   console.log("orders to stop running")
+  setIsStopping(true)
   startButtonState = "stateNotRunning"
+  event.sender.send("start-state-res", startButtonState)
 })
+
+export function sendToConsoleOutput(text: string) {
+  mainWindow!.webContents.send("console-output", text)
+}
+
+export function setIsStopping(to: boolean) {
+  isStopping = to
+}

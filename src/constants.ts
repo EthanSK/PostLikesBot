@@ -4,7 +4,8 @@ const constants = {
   screenshotsDir: "./logs/screenshots",
   databaseFile: "../db/postLikesBot.db",
   mongoDatabaseName: "PostLikesBotDB",
-  appName: "Post Likes Bot"
+  appName: "Post Likes Bot",
+  maxConsoleOutputChars: 200
 }
 
 export default constants

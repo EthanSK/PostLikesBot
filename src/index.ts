@@ -1,5 +1,6 @@
 import { ipcRenderer as ipc } from "electron"
 import { UserDefaultsKey } from "./userDefaults"
+import constants from "./constants"
 
 export const UIElems: UserDefaultsKey[] = [
   "facebookPageId",
@@ -64,19 +65,44 @@ function listenToStartButton() {
     console.log("start button state: ", elem.className)
     switch (elem.className) {
       case "stateNotRunning":
-        elem.innerText = "Stop running"
-        elem.classList.remove("stateNotRunning")
-        elem.classList.add("stateRunning")
-        ipc.send("start-running")
+        ipc.send("start-running-req")
         break
       case "stateRunning":
-        elem.innerText = "Start running"
-        elem.classList.remove("stateRunning")
-        elem.classList.add("stateNotRunning")
-        ipc.send("stop-running")
+        ipc.send("stop-running-req")
         break
     }
   })
 }
 
+ipc.on("start-state-res", function(event, state) {
+  const id = "startButton"
+  const elem = document.getElementById(id)!
+  switch (state) {
+    case "stateRunning":
+      elem.innerText = "Stop running"
+      elem.classList.remove("stateNotRunning")
+      elem.classList.add("stateRunning")
+      break
+    case "stateNotRunning":
+      elem.innerText = "Start running"
+      elem.classList.remove("stateRunning")
+      elem.classList.add("stateNotRunning")
+      break
+  }
+})
+
 listenToStartButton()
+
+ipc.on("console-output", function(event, newText: string) {
+  const elem = document.getElementById("consoleOutput") as HTMLTextAreaElement
+  elem.value += newText + "\n\n"
+  if (elem.value.length > constants.maxConsoleOutputChars) {
+    const split = elem.value.split("\n\n")
+    console.log("split: ", split)
+    split.shift()
+    elem.value = split.join("\n\n")
+  }
+  elem.scrollTop = elem.scrollHeight
+
+  console.log("output to console")
+})

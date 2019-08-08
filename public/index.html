@@ -25,7 +25,12 @@
       from other pages!
     </h3>
 
-    <textarea class="console" placeholder="Output"></textarea>
+    <textarea
+      class="console scrollable"
+      id="consoleOutput"
+      placeholder="Output"
+      readonly="true"
+    ></textarea>
 
     <div class="textBoxContainer">
       <label class="textBoxLabel" for="facebookPageId">facebook page ID</label>
@@ -82,7 +87,7 @@
         class="checkBox"
         id="shouldSkipCurrentlyLikedPosts"
       />
-      Skip all currently liked/reacted posts on next run<br />
+      Skip all currently liked/reacted posts<br />
     </div>
     <div class="checkBoxContainer">
       <label class="checkBoxLabel" for="shouldStartRunningWhenAppOpens"></label>
