@@ -8,12 +8,14 @@ dotenv_1.default.config();
 const getLikes_1 = __importDefault(require("./getLikes"));
 const puppeteer_1 = require("./puppeteer");
 const postLikes_1 = __importDefault(require("./postLikes"));
-const utils_1 = require("./utils");
+const utils_1 = require("../utils");
 const path_1 = __importDefault(require("path"));
-const electronStore_1 = require("./electronStore");
+const electronStore_1 = require("../user/electronStore");
 const electron_1 = require("electron");
-const main_1 = require("./main");
+const main_1 = require("../user/main");
+const electron_log_1 = __importDefault(require("electron-log"));
 let browser;
+let wasLastRunStoppedForcefully = false;
 async function cleanup() {
     try {
         if (browser) {
@@ -30,6 +32,7 @@ async function run() {
     //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
     main_1.sendToConsoleOutput("Started running at " + new Date());
     try {
+        setWasLastRunStoppedForcefully(false);
         browser = await puppeteer_1.createBrowser();
         await puppeteer_1.createPage(browser);
         await puppeteer_1.login();
@@ -46,7 +49,7 @@ async function run() {
         utils_1.createNewDir(imagesDir);
         let memes = [];
         for (const postUrl of unpostedUrls) {
-            const imageUrl = await utils_1.getImageUrl(postUrl);
+            const imageUrl = await getImageUrl(postUrl);
             const file = path_1.default.join(imagesDir, memes.length.toString() + ".png");
             if (imageUrl) {
                 await utils_1.downloadImage(imageUrl, file);
@@ -62,8 +65,25 @@ async function run() {
         return;
     }
     catch (error) {
-        console.error("error run(): ", error);
+        if (!wasLastRunStoppedForcefully) {
+            //otherwise it's not an actual
+            electron_log_1.default.error("run()", error);
+        }
+        else {
+            console.log("not logging error as it was stopped forcefully");
+        }
         return;
     }
 }
 exports.run = run;
+function setWasLastRunStoppedForcefully(value) {
+    wasLastRunStoppedForcefully = value;
+}
+exports.setWasLastRunStoppedForcefully = setWasLastRunStoppedForcefully;
+async function getImageUrl(postUrl) {
+    await puppeteer_1.page.goto(postUrl);
+    await puppeteer_1.page.waitForSelector('img[class="spotlight"]');
+    const imageUrl = await puppeteer_1.page.$eval('img[class="spotlight"]', el => el.getAttribute("src"));
+    console.log("image url: ", imageUrl, "from this post: ", postUrl);
+    return imageUrl;
+}

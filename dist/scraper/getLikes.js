@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("./utils");
 const puppeteer_1 = require("./puppeteer");
-const userDefaults_1 = require("./userDefaults");
+const userDefaults_1 = require("../user/userDefaults");
 async function getLikedPosts() {
     try {
         await goToLikesPage();
@@ -15,7 +14,7 @@ async function getLikedPosts() {
 }
 exports.default = getLikedPosts;
 async function goToLikesPage() {
-    await puppeteer_1.page.goto(utils_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
+    await puppeteer_1.page.goto(likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await puppeteer_1.page.waitForSelector("#facebook");
     console.log("at likes page");
 }
@@ -35,3 +34,7 @@ async function getRecentImages() {
     console.log("valid photo post urls: ", validPhotoURLs);
     return validPhotoURLs;
 }
+function likesPageURL(userProfileId) {
+    return `https://www.facebook.com/${userProfileId}/allactivity?entry_point=www_top_menu_button&privacy_source=activity_log&log_filter=likedposts&category_key=likedposts`;
+}
+exports.likesPageURL = likesPageURL;

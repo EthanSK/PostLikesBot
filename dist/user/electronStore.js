@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_store_1 = __importDefault(require("electron-store"));
-const utils_1 = require("./utils");
+const utils_1 = require("../utils");
 const store = new electron_store_1.default();
 function saveStoreIfNew(postUrl) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json

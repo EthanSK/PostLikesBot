@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
-const constants_1 = __importDefault(require("./constants"));
+const constants_1 = __importDefault(require("../constants"));
 const userDefaults_1 = require("./userDefaults");
-const app_1 = require("./app");
+const runner_1 = require("../scraper/runner");
+const electron_log_1 = __importDefault(require("electron-log"));
 let mainWindow;
 let isStopping = false;
 function createWindow() {
@@ -31,7 +32,7 @@ function createWindow() {
         }
     });
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
+    mainWindow.loadFile(path.join(__dirname, "../../public/index.html"));
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
     mainWindow.webContents.once("did-finish-load", function () {
@@ -74,6 +75,7 @@ electron_1.app.on("activate", () => {
 electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
     console.log("ipc UIElemChanged triggered on data: ", data);
     userDefaults_1.userDefaults.set(data.id, data.value);
+    handleUIElemChangeConsoleOutput(data.id, data.value);
 });
 electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
     const res = {
@@ -90,7 +92,7 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
     if (!isStopping) {
         exports.startButtonState = "stateRunning";
         event.sender.send("start-state-res", exports.startButtonState);
-        await app_1.run();
+        await runner_1.run();
     }
     else {
         sendToConsoleOutput("Cannot start, still stopping");
@@ -99,17 +101,53 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
 electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
+    runner_1.setWasLastRunStoppedForcefully(true);
     sendToConsoleOutput("Stopping...");
-    await app_1.cleanup();
+    await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
     sendToConsoleOutput("Stopped running early.");
 });
 function sendToConsoleOutput(text) {
     mainWindow.webContents.send("console-output", text);
+    electron_log_1.default.info(text);
 }
 exports.sendToConsoleOutput = sendToConsoleOutput;
 function setIsStopping(to) {
     isStopping = to;
 }
 exports.setIsStopping = setIsStopping;
+function handleUIElemChangeConsoleOutput(id, value) {
+    if (id === "shouldShowPuppeteerHead") {
+        if (value === true) {
+            sendToConsoleOutput("Will show behind-the-scenes on next run.");
+        }
+        else {
+            sendToConsoleOutput("Will hide behind-the-scenes on next run.");
+        }
+    }
+    if (id === "shouldSkipCurrentlyLikedPosts") {
+        if (value === true) {
+            sendToConsoleOutput("Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs).");
+        }
+        else {
+            sendToConsoleOutput("Will not skip currently liked/reacted posts, starting from next run.");
+        }
+    }
+    if (id === "shouldStartRunningWhenAppOpens") {
+        if (value === true) {
+            sendToConsoleOutput("Will start running when app opens next time it opens");
+        }
+        else {
+            sendToConsoleOutput("Will wait for you to click 'Start running' next time the app opens");
+        }
+    }
+    if (id === "shouldOpenAtLogin") {
+        if (value === true) {
+            sendToConsoleOutput("Will open app at login");
+        }
+        else {
+            sendToConsoleOutput("Will not open app at login");
+        }
+    }
+}

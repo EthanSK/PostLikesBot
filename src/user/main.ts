@@ -1,11 +1,14 @@
 import { app, BrowserWindow, ipcMain as ipc, dialog } from "electron"
 import * as path from "path"
-import constants from "./constants"
+import constants from "../constants"
 import { userDefaults, UserDefaultsKey } from "./userDefaults"
-import { cleanup, run } from "./app"
-let mainWindow: Electron.BrowserWindow | null
+import { cleanup, run, setWasLastRunStoppedForcefully } from "../scraper/runner"
+import log from "electron-log"
+
+let mainWindow: BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
 let isStopping: boolean = false
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -21,7 +24,7 @@ function createWindow() {
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "../public/index.html"))
+  mainWindow.loadFile(path.join(__dirname, "../../public/index.html"))
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -73,6 +76,7 @@ ipc.on(`ui-elem-changed`, function(
 ) {
   console.log("ipc UIElemChanged triggered on data: ", data)
   userDefaults.set(data.id, data.value)
+  handleUIElemChangeConsoleOutput(data.id, data.value)
 })
 
 ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
@@ -101,6 +105,7 @@ ipc.on("start-running-req", async function(event, data) {
 ipc.on("stop-running-req", async function(event, data) {
   console.log("orders to stop running")
   setIsStopping(true)
+  setWasLastRunStoppedForcefully(true)
   sendToConsoleOutput("Stopping...")
   await cleanup()
   startButtonState = "stateNotRunning"
@@ -110,8 +115,51 @@ ipc.on("stop-running-req", async function(event, data) {
 
 export function sendToConsoleOutput(text: string) {
   mainWindow!.webContents.send("console-output", text)
+  log.info(text)
 }
 
 export function setIsStopping(to: boolean) {
   isStopping = to
+}
+
+function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
+  if (id === "shouldShowPuppeteerHead") {
+    if (value === true) {
+      sendToConsoleOutput("Will show behind-the-scenes on next run.")
+    } else {
+      sendToConsoleOutput("Will hide behind-the-scenes on next run.")
+    }
+  }
+
+  if (id === "shouldSkipCurrentlyLikedPosts") {
+    if (value === true) {
+      sendToConsoleOutput(
+        "Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs)."
+      )
+    } else {
+      sendToConsoleOutput(
+        "Will not skip currently liked/reacted posts, starting from next run."
+      )
+    }
+  }
+
+  if (id === "shouldStartRunningWhenAppOpens") {
+    if (value === true) {
+      sendToConsoleOutput(
+        "Will start running when app opens next time it opens"
+      )
+    } else {
+      sendToConsoleOutput(
+        "Will wait for you to click 'Start running' next time the app opens"
+      )
+    }
+  }
+
+  if (id === "shouldOpenAtLogin") {
+    if (value === true) {
+      sendToConsoleOutput("Will open app at login")
+    } else {
+      sendToConsoleOutput("Will not open app at login")
+    }
+  }
 }

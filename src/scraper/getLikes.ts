@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer"
-import { delay, likesPageURL } from "./utils"
-import constants from "./constants"
+import { delay } from "../utils"
+import constants from "../constants"
 import { createPage, createBrowser, page } from "./puppeteer"
-import { userDefaults } from "./userDefaults"
+import { userDefaults } from "../user/userDefaults"
 
 export default async function getLikedPosts() {
   try {
@@ -36,4 +36,8 @@ async function getRecentImages(): Promise<string[]> {
   }
   console.log("valid photo post urls: ", validPhotoURLs)
   return validPhotoURLs
+}
+
+export function likesPageURL(userProfileId: string): string {
+  return `https://www.facebook.com/${userProfileId}/allactivity?entry_point=www_top_menu_button&privacy_source=activity_log&log_filter=likedposts&category_key=likedposts`
 }

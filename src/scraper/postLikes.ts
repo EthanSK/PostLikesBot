@@ -1,8 +1,8 @@
 import { page } from "./puppeteer"
-import { fbPageURL, delay } from "./utils"
-import { updateIsPosted } from "./electronStore"
-import constants from "./constants"
-import { userDefaults } from "./userDefaults"
+import { delay } from "../utils"
+import { updateIsPosted } from "../user/electronStore"
+import constants from "../constants"
+import { userDefaults } from "../user/userDefaults"
 
 export interface postMemePkg {
   postUrl: string
@@ -57,4 +57,8 @@ async function uploadImage(file: string) {
   await page.click('[data-testid="react-composer-post-button"]')
   await delay(5000) //give it a good long delay so it can post the pic
   console.log("upload image done")
+}
+
+export function fbPageURL(pageId: string): string {
+  return `https://www.facebook.com/${pageId}`
 }

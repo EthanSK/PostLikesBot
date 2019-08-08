@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-const constants_1 = __importDefault(require("./constants"));
+const constants_1 = __importDefault(require("../constants"));
 exports.UIElems = [
     "facebookPageId",
     "facebookProfileId",
@@ -36,6 +36,14 @@ function listenToElementChanges(id) {
         electron_1.ipcRenderer.send("ui-elem-changed", data);
     };
 }
+//restore data to ui ---
+function setupUIElem(id) {
+    electron_1.ipcRenderer.send("ui-elem-data-req", id);
+}
+exports.UIElems.forEach(el => {
+    setupUIElem(el);
+    listenToElementChanges(el);
+});
 electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     console.log("ui data response: ", data);
     const elem = document.getElementById(data.id);
@@ -49,13 +57,7 @@ electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
         elem.checked = data.value;
     }
 });
-function setupUIElem(id) {
-    electron_1.ipcRenderer.send("ui-elem-data-req", id);
-}
-exports.UIElems.forEach(el => {
-    setupUIElem(el);
-    listenToElementChanges(el);
-});
+//----
 function listenToStartButton() {
     const id = "startButton";
     document.getElementById(id).addEventListener("click", function () {
@@ -89,6 +91,9 @@ electron_1.ipcRenderer.on("start-state-res", function (event, state) {
 });
 listenToStartButton();
 electron_1.ipcRenderer.on("console-output", function (event, newText) {
+    sendToConsole(newText);
+});
+function sendToConsole(newText) {
     const elem = document.getElementById("consoleOutput");
     elem.value += newText + "\n\n";
     if (elem.value.length > constants_1.default.maxConsoleOutputChars) {
@@ -99,4 +104,4 @@ electron_1.ipcRenderer.on("console-output", function (event, newText) {
     }
     elem.scrollTop = elem.scrollHeight;
     console.log("output to console");
-});
+}

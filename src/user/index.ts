@@ -1,6 +1,6 @@
 import { ipcRenderer as ipc } from "electron"
 import { UserDefaultsKey } from "./userDefaults"
-import constants from "./constants"
+import constants from "../constants"
 
 export const UIElems: UserDefaultsKey[] = [
   "facebookPageId",
@@ -35,6 +35,15 @@ function listenToElementChanges(id: UserDefaultsKey) {
   }
 }
 
+//restore data to ui ---
+function setupUIElem(id: UserDefaultsKey) {
+  ipc.send("ui-elem-data-req", id)
+}
+
+UIElems.forEach(el => {
+  setupUIElem(el)
+  listenToElementChanges(el)
+})
 ipc.on("ui-elem-data-res", function(
   event,
   data: { id: UserDefaultsKey; value: any }
@@ -48,15 +57,7 @@ ipc.on("ui-elem-data-res", function(
     ;(elem as HTMLInputElement).checked = data.value
   }
 })
-
-function setupUIElem(id: UserDefaultsKey) {
-  ipc.send("ui-elem-data-req", id)
-}
-
-UIElems.forEach(el => {
-  setupUIElem(el)
-  listenToElementChanges(el)
-})
+//----
 
 function listenToStartButton() {
   const id = "startButton"
@@ -94,6 +95,10 @@ ipc.on("start-state-res", function(event, state) {
 listenToStartButton()
 
 ipc.on("console-output", function(event, newText: string) {
+  sendToConsole(newText)
+})
+
+function sendToConsole(newText: string) {
   const elem = document.getElementById("consoleOutput") as HTMLTextAreaElement
   elem.value += newText + "\n\n"
   if (elem.value.length > constants.maxConsoleOutputChars) {
@@ -105,4 +110,4 @@ ipc.on("console-output", function(event, newText: string) {
   elem.scrollTop = elem.scrollHeight
 
   console.log("output to console")
-})
+}

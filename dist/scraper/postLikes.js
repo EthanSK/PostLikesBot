@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
-const utils_1 = require("./utils");
-const electronStore_1 = require("./electronStore");
-const userDefaults_1 = require("./userDefaults");
+const utils_1 = require("../utils");
+const electronStore_1 = require("../user/electronStore");
+const userDefaults_1 = require("../user/userDefaults");
 async function postLikes(memes) {
     try {
         await goToFBPage();
@@ -18,7 +18,7 @@ async function postLikes(memes) {
 }
 exports.default = postLikes;
 async function goToFBPage() {
-    await puppeteer_1.page.goto(utils_1.fbPageURL(userDefaults_1.userDefaults.get("facebookPageId")));
+    await puppeteer_1.page.goto(fbPageURL(userDefaults_1.userDefaults.get("facebookPageId")));
     console.log("at facebook page");
 }
 async function uploadImage(file) {
@@ -50,3 +50,7 @@ async function uploadImage(file) {
     await utils_1.delay(5000); //give it a good long delay so it can post the pic
     console.log("upload image done");
 }
+function fbPageURL(pageId) {
+    return `https://www.facebook.com/${pageId}`;
+}
+exports.fbPageURL = fbPageURL;

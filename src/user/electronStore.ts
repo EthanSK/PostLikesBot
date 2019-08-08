@@ -1,5 +1,5 @@
 import Store from "electron-store"
-import { hashIntFromString } from "./utils"
+import { hashIntFromString } from "../utils"
 const store = new Store()
 import { UserDefaultsKey } from "./userDefaults"
 

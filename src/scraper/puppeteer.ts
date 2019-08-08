@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer"
-import constants from "./constants"
-import { delay, likesPageURL } from "./utils"
-import { userDefaults } from "./userDefaults"
-
+import constants from "../constants"
+import { delay } from "../utils"
+import { userDefaults } from "../user/userDefaults"
+import { likesPageURL } from "./getLikes"
 export let page: puppeteer.Page
 
 export async function createBrowser() {

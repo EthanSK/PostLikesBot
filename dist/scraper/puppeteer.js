@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
-const constants_1 = __importDefault(require("./constants"));
-const utils_1 = require("./utils");
-const userDefaults_1 = require("./userDefaults");
+const constants_1 = __importDefault(require("../constants"));
+const userDefaults_1 = require("../user/userDefaults");
+const getLikes_1 = require("./getLikes");
 async function createBrowser() {
     let headless = true;
     if (userDefaults_1.userDefaults.get("shouldShowPuppeteerHead")) {
@@ -35,7 +35,7 @@ async function login() {
         !userDefaults_1.userDefaults.get("facebookPageId")) {
         throw new Error("email or password or profileId or pageId not set");
     }
-    await exports.page.goto(utils_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
+    await exports.page.goto(getLikes_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await exports.page.waitForSelector("#email");
     await exports.page.type("#email", userDefaults_1.userDefaults.get("facebookEmail"));
     await exports.page.type("#pass", userDefaults_1.userDefaults.get("facebookPassword"));
