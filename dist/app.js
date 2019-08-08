@@ -13,12 +13,29 @@ const path_1 = __importDefault(require("path"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const electronStore_1 = require("./electronStore");
 const electron_1 = require("electron");
-async function run() {
+const main_1 = require("./main");
+async function stoppableRun() {
+    const iter = run();
+    let resumeValue;
+    for (;;) {
+        if (main_1.startButtonState === "stateNotRunning") {
+            console.log("stopping run early");
+            return;
+        }
+        const n = iter.next(resumeValue);
+        if (n.done) {
+            return n.value;
+        }
+        resumeValue = await n.value;
+    }
+}
+exports.default = stoppableRun;
+function* run() {
     try {
-        const browser = await puppeteer_1.createBrowser();
-        await puppeteer_1.createPage(browser);
-        await puppeteer_1.login();
-        const urls = await getLikes_1.default();
+        const browser = yield puppeteer_1.createBrowser();
+        yield puppeteer_1.createPage(browser);
+        yield puppeteer_1.login();
+        const urls = yield getLikes_1.default();
         // await mongooseConnect()
         if (!urls) {
             return;
@@ -33,23 +50,24 @@ async function run() {
         utils_1.createNewDir(imagesDir);
         let memes = [];
         for (const postUrl of unpostedUrls) {
-            const imageUrl = await utils_1.getImageUrl(postUrl);
+            const imageUrl = yield utils_1.getImageUrl(postUrl);
             const file = path_1.default.join(imagesDir, memes.length.toString() + ".png");
             if (imageUrl) {
-                await utils_1.downloadImage(imageUrl, file);
+                yield utils_1.downloadImage(imageUrl, file);
                 memes.push({
                     postUrl,
                     file
                 });
             }
         }
-        await postLikes_1.default(memes);
-        await mongoose_1.default.disconnect(); //otherwise node never ends
-        await browser.close();
+        yield postLikes_1.default(memes);
+        yield mongoose_1.default.disconnect(); //otherwise node never ends
+        yield browser.close();
         console.log("finished!");
+        return;
     }
     catch (error) {
         console.error("error: ", error);
+        return;
     }
 }
-exports.default = run;

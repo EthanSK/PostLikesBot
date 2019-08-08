@@ -4,14 +4,15 @@ import run from "./app"
 import constants from "./constants"
 import { userDefaults, UserDefaultsKey } from "./userDefaults"
 let mainWindow: Electron.BrowserWindow | null
+export let startButtonState: "stateRunning" | "stateNotRunning"
 
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 650,
-    width: 650,
-    minHeight: 650,
-    minWidth: 650,
+    height: 675,
+    width: 675,
+    minHeight: 675,
+    minWidth: 675,
     titleBarStyle: "hiddenInset",
     title: constants.appName,
     webPreferences: {
@@ -82,7 +83,17 @@ ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
 
   console.log("res: ", res)
   mainWindow!.webContents.once("did-finish-load", function() {
-    console.log("did finish load")
     event.sender.send("ui-elem-data-res", res)
   })
+})
+
+ipc.on("start-running", async function(event, data) {
+  console.log("orders to start running boss")
+  startButtonState = "stateRunning"
+  await run()
+})
+
+ipc.on("stop-running", function(event, data) {
+  console.log("orders to stop running")
+  startButtonState = "stateNotRunning"
 })

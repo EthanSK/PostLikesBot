@@ -76,6 +76,15 @@
     </div>
 
     <div class="checkBoxContainer">
+      <label class="checkBoxLabel" for="shouldSkipCurrentlyLikedPosts"></label>
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldSkipCurrentlyLikedPosts"
+      />
+      Skip all currently liked/reacted posts on next run<br />
+    </div>
+    <div class="checkBoxContainer">
       <label class="checkBoxLabel" for="shouldStartRunningWhenAppOpens"></label>
       <input
         type="checkbox"
@@ -85,19 +94,11 @@
       Start running when app opens<br />
     </div>
     <div class="checkBoxContainer">
-      <label class="checkBoxLabel" for="shouldSkipCurrentlyLikedPosts"></label>
-      <input
-        type="checkbox"
-        class="checkBox"
-        id="shouldSkipCurrentlyLikedPosts"
-      />
-      Skip all currently liked/reacted posts<br />
-    </div>
-    <div class="checkBoxContainer">
       <label class="checkBoxLabel" for="shouldOpenAtLogin"></label>
       <input type="checkbox" class="checkBox" id="shouldOpenAtLogin" />
       Open app at login<br />
     </div>
+    <button class="stateNotRunning" id="startButton">Start running</button>
     <script>
       require("../dist/index")
     </script>

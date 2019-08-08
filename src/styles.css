@@ -28,9 +28,11 @@
   border: 0px;
   outline: 0px;
   padding-left: 10px;
+  padding-top: 5px;
   margin-left: 10px;
   resize: none;
   margin-top: -2px;
+  margin-right: 5px;
 }
 
 *:not(.title),
@@ -92,7 +94,7 @@ input[type="password"] {
 
 .checkBox {
   margin-top: 10px;
-  margin-left: 30px;
+  margin-left: 4px;
 }
 
 input[type="checkbox"] {
@@ -102,4 +104,25 @@ input[type="checkbox"] {
   border: 0px;
   background-color: white;
   outline: 0px;
+}
+
+#startButton {
+  background-color: white;
+  border-radius: 15px;
+
+  border: none;
+  color: #3b5998;
+  padding: 15px 0px;
+  width: 200px;
+  margin-top: 50px;
+  margin-left: 125px;
+  font-family: klavika-bold;
+  font-size: 20px;
+  cursor: pointer;
+  outline: 0px;
+}
+
+#startButton:hover {
+  /* cursor: pointer; glitchy with webkit app region drag */
+  background-color: lightgray;
 }

@@ -14,16 +14,33 @@ import {
   saveUserDefault
 } from "./electronStore"
 import { app } from "electron"
+import { startButtonState } from "./main"
 
-export default async function run() {
+export default async function stoppableRun() {
+  const iter = run()
+  let resumeValue
+  for (;;) {
+    if (startButtonState === "stateNotRunning") {
+      console.log("stopping run early")
+      return
+    }
+    const n = iter.next(resumeValue)
+    if (n.done) {
+      return n.value
+    }
+    resumeValue = await n.value
+  }
+}
+
+function* run() {
   try {
-    const browser = await createBrowser()
+    const browser = yield createBrowser()
 
-    await createPage(browser)
+    yield createPage(browser)
 
-    await login()
+    yield login()
 
-    const urls = await getLikedPosts()
+    const urls: string[] = yield getLikedPosts()
     // await mongooseConnect()
     if (!urls) {
       return
@@ -38,21 +55,23 @@ export default async function run() {
     createNewDir(imagesDir)
     let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
-      const imageUrl = await getImageUrl(postUrl)
+      const imageUrl = yield getImageUrl(postUrl)
       const file = path.join(imagesDir, memes.length.toString() + ".png")
       if (imageUrl) {
-        await downloadImage(imageUrl, file)
+        yield downloadImage(imageUrl, file)
         memes.push({
           postUrl,
           file
         })
       }
     }
-    await postLikes(memes)
-    await mongoose.disconnect() //otherwise node never ends
-    await browser.close()
+    yield postLikes(memes)
+    yield mongoose.disconnect() //otherwise node never ends
+    yield browser.close()
     console.log("finished!")
+    return
   } catch (error) {
     console.error("error: ", error)
+    return
   }
 }

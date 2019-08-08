@@ -12,16 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
+const app_1 = __importDefault(require("./app"));
 const constants_1 = __importDefault(require("./constants"));
 const userDefaults_1 = require("./userDefaults");
 let mainWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
-        height: 650,
-        width: 650,
-        minHeight: 650,
-        minWidth: 650,
+        height: 675,
+        width: 675,
+        minHeight: 675,
+        minWidth: 675,
         titleBarStyle: "hiddenInset",
         title: constants_1.default.appName,
         webPreferences: {
@@ -80,7 +81,15 @@ electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
     };
     console.log("res: ", res);
     mainWindow.webContents.once("did-finish-load", function () {
-        console.log("did finish load");
         event.sender.send("ui-elem-data-res", res);
     });
+});
+electron_1.ipcMain.on("start-running", async function (event, data) {
+    console.log("orders to start running boss");
+    exports.startButtonState = "stateRunning";
+    await app_1.default();
+});
+electron_1.ipcMain.on("stop-running", function (event, data) {
+    console.log("orders to stop running");
+    exports.startButtonState = "stateNotRunning";
 });

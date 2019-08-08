@@ -52,3 +52,25 @@ exports.UIElems.forEach(el => {
     setupUIElem(el);
     listenToElementChanges(el);
 });
+function listenToStartButton() {
+    const id = "startButton";
+    document.getElementById(id).addEventListener("click", function () {
+        const elem = document.getElementById(id);
+        console.log("start button state: ", elem.className);
+        switch (elem.className) {
+            case "stateNotRunning":
+                elem.innerText = "Stop running";
+                elem.classList.remove("stateNotRunning");
+                elem.classList.add("stateRunning");
+                electron_1.ipcRenderer.send("start-running");
+                break;
+            case "stateRunning":
+                elem.innerText = "Start running";
+                elem.classList.remove("stateRunning");
+                elem.classList.add("stateNotRunning");
+                electron_1.ipcRenderer.send("stop-running");
+                break;
+        }
+    });
+}
+listenToStartButton();
