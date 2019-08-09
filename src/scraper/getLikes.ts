@@ -5,6 +5,7 @@ import { createPage, createBrowser, page } from "./puppeteer"
 import { userDefaults } from "../user/userDefaults"
 import log from "electron-log"
 import { sendToConsoleOutput } from "../user/main"
+import { wasLastRunStoppedForcefully } from "./runner"
 
 export default async function getLikedPosts() {
   try {
@@ -12,8 +13,11 @@ export default async function getLikedPosts() {
     const postUrls = await getRecentImages()
     return postUrls
   } catch (error) {
-    console.error("error getting likes: ", error)
-    sendToConsoleOutput("Error getting liked posts:" + error.message, "error")
+    if (!wasLastRunStoppedForcefully) {
+      sendToConsoleOutput("Error getting liked posts:" + error.message, "error")
+    } else {
+      console.log("not logging error as it was stopped forcefully")
+    }
   }
 }
 

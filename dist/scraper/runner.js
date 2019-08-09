@@ -29,7 +29,7 @@ async function cleanup() {
 exports.cleanup = cleanup;
 async function run() {
     //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
-    main_1.sendToConsoleOutput("Started running at " + new Date(), "info");
+    main_1.sendToConsoleOutput("Started running at " + new Date(), "startstop");
     try {
         setWasLastRunStoppedForcefully(false);
         browser = await puppeteer_1.createBrowser();
@@ -49,8 +49,7 @@ async function run() {
         }
         const unpostedUrls = urls.filter(url => !electronStore_1.checkIfPosted(url));
         main_1.sendToConsoleOutput(`Found ${unpostedUrls.length} posts that need to be posted`, "info");
-        const imagesDir = "./temp";
-        utils_1.createNewDir(imagesDir);
+        const imagesDir = electron_1.app.getPath("temp");
         let memes = [];
         for (const postUrl of unpostedUrls) {
             main_1.sendToConsoleOutput(`Downloading image in post at ${postUrl}`, "loading");
@@ -72,7 +71,7 @@ async function run() {
         await postLikes_1.default(memes);
         main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();
-        main_1.sendToConsoleOutput("Finished the batch", "success");
+        main_1.sendToConsoleOutput("Finished the batch at " + new Date(), "startstop");
         return;
     }
     catch (error) {

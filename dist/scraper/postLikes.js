@@ -5,6 +5,7 @@ const utils_1 = require("../utils");
 const electronStore_1 = require("../user/electronStore");
 const userDefaults_1 = require("../user/userDefaults");
 const main_1 = require("../user/main");
+const runner_1 = require("./runner");
 async function postLikes(memes) {
     try {
         await goToFBPage();
@@ -16,8 +17,12 @@ async function postLikes(memes) {
         }
     }
     catch (error) {
-        console.error("error posting likes: ", error);
-        main_1.sendToConsoleOutput("Error posting to page: " + error.message, "error");
+        if (!runner_1.wasLastRunStoppedForcefully) {
+            main_1.sendToConsoleOutput("Error posting to page: " + error.message, "error");
+        }
+        else {
+            console.log("not logging error as it was stopped forcefully");
+        }
     }
 }
 exports.default = postLikes;

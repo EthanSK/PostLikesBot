@@ -102,44 +102,12 @@ electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
     runner_1.setWasLastRunStoppedForcefully(true);
-    sendToConsoleOutput("Stopping...", "info");
+    sendToConsoleOutput("Stopping...", "loading");
     await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
     sendToConsoleOutput("Stopped running early.", "info");
 });
-function sendToConsoleOutput(text, type) {
-    let emojiPrefix = "";
-    switch (type) {
-        case "info":
-            emojiPrefix = "ℹ️";
-            break;
-        case "error":
-            emojiPrefix = "🛑";
-            break;
-        case "loading":
-            emojiPrefix = "⏳";
-            break;
-        case "success":
-            emojiPrefix = "✅";
-            break;
-        case "settings":
-            emojiPrefix = "⚙️";
-            break;
-        case "sadtimes":
-            emojiPrefix = "😭";
-            break;
-    }
-    const output = emojiPrefix + " " + text;
-    mainWindow.webContents.send("console-output", output);
-    if (type === "error") {
-        electron_log_1.default.error(output);
-    }
-    else {
-        electron_log_1.default.info(output);
-    }
-}
-exports.sendToConsoleOutput = sendToConsoleOutput;
 function setIsStopping(to) {
     isStopping = to;
 }
@@ -178,3 +146,38 @@ function handleUIElemChangeConsoleOutput(id, value) {
         }
     }
 }
+function sendToConsoleOutput(text, type) {
+    let emojiPrefix = "";
+    switch (type) {
+        case "info":
+            emojiPrefix = "ℹ️";
+            break;
+        case "error":
+            emojiPrefix = "🛑";
+            break;
+        case "loading":
+            emojiPrefix = "⏳";
+            break;
+        case "success":
+            emojiPrefix = "✅";
+            break;
+        case "settings":
+            emojiPrefix = "⚙️";
+            break;
+        case "sadtimes":
+            emojiPrefix = "😭";
+            break;
+        case "startstop":
+            emojiPrefix = "🏁";
+            break;
+    }
+    const output = emojiPrefix + " " + text;
+    mainWindow.webContents.send("console-output", output);
+    if (type === "error") {
+        electron_log_1.default.error(output);
+    }
+    else {
+        electron_log_1.default.info(output);
+    }
+}
+exports.sendToConsoleOutput = sendToConsoleOutput;

@@ -37,7 +37,7 @@ export async function cleanup() {
 
 export async function run() {
   //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
-  sendToConsoleOutput("Started running at " + new Date(), "info")
+  sendToConsoleOutput("Started running at " + new Date(), "startstop")
 
   try {
     setWasLastRunStoppedForcefully(false)
@@ -64,8 +64,7 @@ export async function run() {
       `Found ${unpostedUrls.length} posts that need to be posted`,
       "info"
     )
-    const imagesDir = "./temp"
-    createNewDir(imagesDir)
+    const imagesDir = app.getPath("temp")
     let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
       sendToConsoleOutput(`Downloading image in post at ${postUrl}`, "loading")
@@ -86,7 +85,7 @@ export async function run() {
     await postLikes(memes)
     sendToConsoleOutput("Cleaning up", "loading")
     await cleanup()
-    sendToConsoleOutput("Finished the batch", "success")
+    sendToConsoleOutput("Finished the batch at " + new Date(), "startstop")
     return
   } catch (error) {
     if (!wasLastRunStoppedForcefully) {

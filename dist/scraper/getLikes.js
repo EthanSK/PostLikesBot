@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
 const userDefaults_1 = require("../user/userDefaults");
 const main_1 = require("../user/main");
+const runner_1 = require("./runner");
 async function getLikedPosts() {
     try {
         await goToLikesPage();
@@ -10,8 +11,12 @@ async function getLikedPosts() {
         return postUrls;
     }
     catch (error) {
-        console.error("error getting likes: ", error);
-        main_1.sendToConsoleOutput("Error getting liked posts:" + error.message, "error");
+        if (!runner_1.wasLastRunStoppedForcefully) {
+            main_1.sendToConsoleOutput("Error getting liked posts:" + error.message, "error");
+        }
+        else {
+            console.log("not logging error as it was stopped forcefully");
+        }
     }
 }
 exports.default = getLikedPosts;

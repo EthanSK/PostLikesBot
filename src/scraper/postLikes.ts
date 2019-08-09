@@ -5,6 +5,7 @@ import constants from "../constants"
 import { userDefaults } from "../user/userDefaults"
 import log from "electron-log"
 import { sendToConsoleOutput } from "../user/main"
+import { wasLastRunStoppedForcefully } from "./runner"
 
 export interface postMemePkg {
   postUrl: string
@@ -22,8 +23,11 @@ export default async function postLikes(memes: postMemePkg[]) {
       sendToConsoleOutput("Successfully posted image", "success")
     }
   } catch (error) {
-    console.error("error posting likes: ", error)
-    sendToConsoleOutput("Error posting to page: " + error.message, "error")
+    if (!wasLastRunStoppedForcefully) {
+      sendToConsoleOutput("Error posting to page: " + error.message, "error")
+    } else {
+      console.log("not logging error as it was stopped forcefully")
+    }
   }
 }
 

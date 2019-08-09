@@ -106,46 +106,12 @@ ipc.on("stop-running-req", async function(event, data) {
   console.log("orders to stop running")
   setIsStopping(true)
   setWasLastRunStoppedForcefully(true)
-  sendToConsoleOutput("Stopping...", "info")
+  sendToConsoleOutput("Stopping...", "loading")
   await cleanup()
   startButtonState = "stateNotRunning"
   event.sender.send("start-state-res", startButtonState)
   sendToConsoleOutput("Stopped running early.", "info")
 })
-
-export function sendToConsoleOutput(
-  text: string,
-  type: "info" | "error" | "loading" | "success" | "settings" | "sadtimes"
-) {
-  let emojiPrefix: string = ""
-  switch (type) {
-    case "info":
-      emojiPrefix = "ℹ️"
-      break
-    case "error":
-      emojiPrefix = "🛑"
-      break
-    case "loading":
-      emojiPrefix = "⏳"
-      break
-    case "success":
-      emojiPrefix = "✅"
-      break
-    case "settings":
-      emojiPrefix = "⚙️"
-      break
-    case "sadtimes":
-      emojiPrefix = "😭"
-      break
-  }
-  const output = emojiPrefix + " " + text
-  mainWindow!.webContents.send("console-output", output)
-  if (type === "error") {
-    log.error(output)
-  } else {
-    log.info(output)
-  }
-}
 
 export function setIsStopping(to: boolean) {
   isStopping = to
@@ -200,5 +166,49 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
     } else {
       sendToConsoleOutput("Will not open app at login", "settings")
     }
+  }
+}
+
+export function sendToConsoleOutput(
+  text: string,
+  type:
+    | "info"
+    | "error"
+    | "loading"
+    | "success"
+    | "settings"
+    | "sadtimes"
+    | "startstop"
+) {
+  let emojiPrefix: string = ""
+  switch (type) {
+    case "info":
+      emojiPrefix = "ℹ️"
+      break
+    case "error":
+      emojiPrefix = "🛑"
+      break
+    case "loading":
+      emojiPrefix = "⏳"
+      break
+    case "success":
+      emojiPrefix = "✅"
+      break
+    case "settings":
+      emojiPrefix = "⚙️"
+      break
+    case "sadtimes":
+      emojiPrefix = "😭"
+      break
+    case "startstop":
+      emojiPrefix = "🏁"
+      break
+  }
+  const output = emojiPrefix + " " + text
+  mainWindow!.webContents.send("console-output", output)
+  if (type === "error") {
+    log.error(output)
+  } else {
+    log.info(output)
   }
 }
