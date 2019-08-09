@@ -10,7 +10,8 @@
   height: 60px;
   justify-content: center;
   margin-top: -10px;
-  padding-top: 5px;
+  margin-bottom: 20px;
+  padding-top: 10px;
   -webkit-app-region: drag;
 }
 #slogan {

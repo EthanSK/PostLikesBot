@@ -67,7 +67,9 @@ async function run() {
                 main_1.sendToConsoleOutput("Couldn't find the image URL", "sadtimes");
             }
         }
-        main_1.sendToConsoleOutput("Preparing to post images to your page", "loading");
+        if (memes.length > 0) {
+            main_1.sendToConsoleOutput("Preparing to post images to your page", "loading");
+        }
         await postLikes_1.default(memes);
         main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();

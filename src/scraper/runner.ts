@@ -81,7 +81,9 @@ export async function run() {
         sendToConsoleOutput("Couldn't find the image URL", "sadtimes")
       }
     }
-    sendToConsoleOutput("Preparing to post images to your page", "loading")
+    if (memes.length > 0) {
+      sendToConsoleOutput("Preparing to post images to your page", "loading")
+    }
     await postLikes(memes)
     sendToConsoleOutput("Cleaning up", "loading")
     await cleanup()
