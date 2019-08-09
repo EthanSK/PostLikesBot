@@ -22,7 +22,7 @@ import { Browser } from "puppeteer"
 import log from "electron-log"
 
 let browser: Browser
-let wasLastRunStoppedForcefully = false
+export let wasLastRunStoppedForcefully = false
 
 export async function cleanup() {
   try {
@@ -37,7 +37,7 @@ export async function cleanup() {
 
 export async function run() {
   //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
-  sendToConsoleOutput("Started running at " + new Date())
+  sendToConsoleOutput("Started running at " + new Date(), "info")
 
   try {
     setWasLastRunStoppedForcefully(false)
@@ -45,22 +45,30 @@ export async function run() {
     browser = await createBrowser()
 
     await createPage(browser)
-
+    sendToConsoleOutput("Logging in", "loading")
     await login()
-
+    sendToConsoleOutput("Getting liked/reacted posts", "loading")
     const urls = await getLikedPosts()
     if (!urls) {
+      sendToConsoleOutput("Couldn't find any post", "sadtimes")
       return
     }
+    sendToConsoleOutput(`Scanning ${urls!.length} most recent posts`, "loading")
+
     console.log("app data store: ", app.getPath("userData"))
     for (const url of urls) {
       saveStoreIfNew(url) //is sync
     }
     const unpostedUrls = urls.filter(url => !checkIfPosted(url))
+    sendToConsoleOutput(
+      `Found ${unpostedUrls.length} posts that need to be posted`,
+      "info"
+    )
     const imagesDir = "./temp"
     createNewDir(imagesDir)
     let memes: postMemePkg[] = []
     for (const postUrl of unpostedUrls) {
+      sendToConsoleOutput(`Downloading image in post at ${postUrl}`, "loading")
       const imageUrl = await getImageUrl(postUrl)
       const file = path.join(imagesDir, memes.length.toString() + ".png")
       if (imageUrl) {
@@ -69,16 +77,21 @@ export async function run() {
           postUrl,
           file
         })
+        sendToConsoleOutput("Downloaded image successfully", "info")
+      } else {
+        sendToConsoleOutput("Couldn't find the image URL", "sadtimes")
       }
     }
+    sendToConsoleOutput("Preparing to post images to your page", "loading")
     await postLikes(memes)
+    sendToConsoleOutput("Cleaning up", "loading")
     await cleanup()
-    console.log("finished!")
+    sendToConsoleOutput("Finished the batch", "success")
     return
   } catch (error) {
     if (!wasLastRunStoppedForcefully) {
       //otherwise it's not an actual
-      log.error("run()", error)
+      sendToConsoleOutput("Error: " + error.message, "error")
     } else {
       console.log("not logging error as it was stopped forcefully")
     }

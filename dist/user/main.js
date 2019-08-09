@@ -95,22 +95,49 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
         await runner_1.run();
     }
     else {
-        sendToConsoleOutput("Cannot start, still stopping");
+        sendToConsoleOutput("Cannot start, process is still stopping", "info");
     }
 });
 electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
     runner_1.setWasLastRunStoppedForcefully(true);
-    sendToConsoleOutput("Stopping...");
+    sendToConsoleOutput("Stopping...", "info");
     await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
-    sendToConsoleOutput("Stopped running early.");
+    sendToConsoleOutput("Stopped running early.", "info");
 });
-function sendToConsoleOutput(text) {
-    mainWindow.webContents.send("console-output", text);
-    electron_log_1.default.info(text);
+function sendToConsoleOutput(text, type) {
+    let emojiPrefix = "";
+    switch (type) {
+        case "info":
+            emojiPrefix = "ℹ️";
+            break;
+        case "error":
+            emojiPrefix = "🛑";
+            break;
+        case "loading":
+            emojiPrefix = "⏳";
+            break;
+        case "success":
+            emojiPrefix = "✅";
+            break;
+        case "settings":
+            emojiPrefix = "⚙️";
+            break;
+        case "sadtimes":
+            emojiPrefix = "😭";
+            break;
+    }
+    const output = emojiPrefix + " " + text;
+    mainWindow.webContents.send("console-output", output);
+    if (type === "error") {
+        electron_log_1.default.error(output);
+    }
+    else {
+        electron_log_1.default.info(output);
+    }
 }
 exports.sendToConsoleOutput = sendToConsoleOutput;
 function setIsStopping(to) {
@@ -120,34 +147,34 @@ exports.setIsStopping = setIsStopping;
 function handleUIElemChangeConsoleOutput(id, value) {
     if (id === "shouldShowPuppeteerHead") {
         if (value === true) {
-            sendToConsoleOutput("Will show behind-the-scenes on next run.");
+            sendToConsoleOutput("Will show behind-the-scenes on next run.", "settings");
         }
         else {
-            sendToConsoleOutput("Will hide behind-the-scenes on next run.");
+            sendToConsoleOutput("Will hide behind-the-scenes on next run.", "settings");
         }
     }
     if (id === "shouldSkipCurrentlyLikedPosts") {
         if (value === true) {
-            sendToConsoleOutput("Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs).");
+            sendToConsoleOutput("Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs).", "settings");
         }
         else {
-            sendToConsoleOutput("Will not skip currently liked/reacted posts, starting from next run.");
+            sendToConsoleOutput("Will not skip currently liked/reacted posts, starting from next run.", "settings");
         }
     }
     if (id === "shouldStartRunningWhenAppOpens") {
         if (value === true) {
-            sendToConsoleOutput("Will start running when app opens next time it opens");
+            sendToConsoleOutput("Will start running when app opens next time it opens", "settings");
         }
         else {
-            sendToConsoleOutput("Will wait for you to click 'Start running' next time the app opens");
+            sendToConsoleOutput("Will wait for you to click 'Start running' next time the app opens", "settings");
         }
     }
     if (id === "shouldOpenAtLogin") {
         if (value === true) {
-            sendToConsoleOutput("Will open app at login");
+            sendToConsoleOutput("Will open app at login", "settings");
         }
         else {
-            sendToConsoleOutput("Will not open app at login");
+            sendToConsoleOutput("Will not open app at login", "settings");
         }
     }
 }

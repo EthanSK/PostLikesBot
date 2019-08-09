@@ -7,6 +7,9 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
 const constants_1 = __importDefault(require("../constants"));
 const userDefaults_1 = require("../user/userDefaults");
 const getLikes_1 = require("./getLikes");
+function getChromiumExecPath() {
+    return puppeteer_1.default.executablePath().replace("app.asar", "app.asar.unpacked");
+}
 async function createBrowser() {
     let headless = true;
     if (userDefaults_1.userDefaults.get("shouldShowPuppeteerHead")) {
@@ -15,7 +18,8 @@ async function createBrowser() {
     const browser = await puppeteer_1.default.launch({
         headless: headless,
         slowMo: constants_1.default.slowMo,
-        args: ["--no-sandbox", "--disable-notifications"] //chromium notifs get in the way when in non headless mode
+        args: ["--no-sandbox", "--disable-notifications"],
+        executablePath: getChromiumExecPath()
     });
     return browser;
 }
@@ -33,7 +37,7 @@ async function login() {
         !userDefaults_1.userDefaults.get("facebookPassword") ||
         !userDefaults_1.userDefaults.get("facebookProfileId") ||
         !userDefaults_1.userDefaults.get("facebookPageId")) {
-        throw new Error("email or password or profileId or pageId not set");
+        throw new Error("Email, password, profile ID, or page ID can't be found");
     }
     await exports.page.goto(getLikes_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await exports.page.waitForSelector("#email");
@@ -45,6 +49,10 @@ async function login() {
         //error logging in, prolly coz cookies thing
         await exports.page.type("#pass", userDefaults_1.userDefaults.get("facebookPassword"));
         await exports.page.click("#loginbutton");
+    }
+    //if the login form STILL shows, there must be some sort of error
+    if ((await exports.page.$("#login_form")) !== null) {
+        throw new Error("There was an error logging in to facebook. Please check your credentials and other inputs.");
     }
     console.log("login done");
 }

@@ -4,16 +4,20 @@ const puppeteer_1 = require("./puppeteer");
 const utils_1 = require("../utils");
 const electronStore_1 = require("../user/electronStore");
 const userDefaults_1 = require("../user/userDefaults");
+const main_1 = require("../user/main");
 async function postLikes(memes) {
     try {
         await goToFBPage();
         for (const meme of memes) {
+            main_1.sendToConsoleOutput(`Posting image with URL ${meme.postUrl}`, "loading");
             await uploadImage(meme.file);
             await electronStore_1.updateIsPosted(true, meme.postUrl);
+            main_1.sendToConsoleOutput("Successfully posted image", "success");
         }
     }
     catch (error) {
         console.error("error posting likes: ", error);
+        main_1.sendToConsoleOutput("Error posting to page: " + error.message, "error");
     }
 }
 exports.default = postLikes;

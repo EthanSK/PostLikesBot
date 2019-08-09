@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = require("./puppeteer");
 const userDefaults_1 = require("../user/userDefaults");
+const main_1 = require("../user/main");
 async function getLikedPosts() {
     try {
         await goToLikesPage();
@@ -10,12 +11,14 @@ async function getLikedPosts() {
     }
     catch (error) {
         console.error("error getting likes: ", error);
+        main_1.sendToConsoleOutput("Error getting liked posts:" + error.message, "error");
     }
 }
 exports.default = getLikedPosts;
 async function goToLikesPage() {
     await puppeteer_1.page.goto(likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
-    await puppeteer_1.page.waitForSelector("#facebook");
+    // await page.waitForSelector("#facebook")
+    await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Posts and Comments')]");
     console.log("at likes page");
 }
 async function getRecentImages() {

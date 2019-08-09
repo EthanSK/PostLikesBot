@@ -13,9 +13,8 @@ const path_1 = __importDefault(require("path"));
 const electronStore_1 = require("../user/electronStore");
 const electron_1 = require("electron");
 const main_1 = require("../user/main");
-const electron_log_1 = __importDefault(require("electron-log"));
 let browser;
-let wasLastRunStoppedForcefully = false;
+exports.wasLastRunStoppedForcefully = false;
 async function cleanup() {
     try {
         if (browser) {
@@ -30,25 +29,31 @@ async function cleanup() {
 exports.cleanup = cleanup;
 async function run() {
     //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
-    main_1.sendToConsoleOutput("Started running at " + new Date());
+    main_1.sendToConsoleOutput("Started running at " + new Date(), "info");
     try {
         setWasLastRunStoppedForcefully(false);
         browser = await puppeteer_1.createBrowser();
         await puppeteer_1.createPage(browser);
+        main_1.sendToConsoleOutput("Logging in", "loading");
         await puppeteer_1.login();
+        main_1.sendToConsoleOutput("Getting liked/reacted posts", "loading");
         const urls = await getLikes_1.default();
         if (!urls) {
+            main_1.sendToConsoleOutput("Couldn't find any post", "sadtimes");
             return;
         }
+        main_1.sendToConsoleOutput(`Scanning ${urls.length} most recent posts`, "loading");
         console.log("app data store: ", electron_1.app.getPath("userData"));
         for (const url of urls) {
             electronStore_1.saveStoreIfNew(url); //is sync
         }
         const unpostedUrls = urls.filter(url => !electronStore_1.checkIfPosted(url));
+        main_1.sendToConsoleOutput(`Found ${unpostedUrls.length} posts that need to be posted`, "info");
         const imagesDir = "./temp";
         utils_1.createNewDir(imagesDir);
         let memes = [];
         for (const postUrl of unpostedUrls) {
+            main_1.sendToConsoleOutput(`Downloading image in post at ${postUrl}`, "loading");
             const imageUrl = await getImageUrl(postUrl);
             const file = path_1.default.join(imagesDir, memes.length.toString() + ".png");
             if (imageUrl) {
@@ -57,17 +62,23 @@ async function run() {
                     postUrl,
                     file
                 });
+                main_1.sendToConsoleOutput("Downloaded image successfully", "info");
+            }
+            else {
+                main_1.sendToConsoleOutput("Couldn't find the image URL", "sadtimes");
             }
         }
+        main_1.sendToConsoleOutput("Preparing to post images to your page", "loading");
         await postLikes_1.default(memes);
+        main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();
-        console.log("finished!");
+        main_1.sendToConsoleOutput("Finished the batch", "success");
         return;
     }
     catch (error) {
-        if (!wasLastRunStoppedForcefully) {
+        if (!exports.wasLastRunStoppedForcefully) {
             //otherwise it's not an actual
-            electron_log_1.default.error("run()", error);
+            main_1.sendToConsoleOutput("Error: " + error.message, "error");
         }
         else {
             console.log("not logging error as it was stopped forcefully");
@@ -77,7 +88,7 @@ async function run() {
 }
 exports.run = run;
 function setWasLastRunStoppedForcefully(value) {
-    wasLastRunStoppedForcefully = value;
+    exports.wasLastRunStoppedForcefully = value;
 }
 exports.setWasLastRunStoppedForcefully = setWasLastRunStoppedForcefully;
 async function getImageUrl(postUrl) {

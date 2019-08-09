@@ -3,6 +3,8 @@ import { delay } from "../utils"
 import constants from "../constants"
 import { createPage, createBrowser, page } from "./puppeteer"
 import { userDefaults } from "../user/userDefaults"
+import log from "electron-log"
+import { sendToConsoleOutput } from "../user/main"
 
 export default async function getLikedPosts() {
   try {
@@ -11,12 +13,15 @@ export default async function getLikedPosts() {
     return postUrls
   } catch (error) {
     console.error("error getting likes: ", error)
+    sendToConsoleOutput("Error getting liked posts:" + error.message, "error")
   }
 }
 
 async function goToLikesPage() {
   await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
-  await page.waitForSelector("#facebook")
+  // await page.waitForSelector("#facebook")
+  await page.waitForXPath("//div[contains(text(), 'Posts and Comments')]")
+
   console.log("at likes page")
 }
 

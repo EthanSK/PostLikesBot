@@ -37,6 +37,8 @@
     "appId": "com.ethansk.postlikesbot",
     "productName": "Post Likes Bot",
     "copyright": "Copyright © 2019 ${author}",
+    "asar": true,
+    "asarUnpack": "node_modules/puppeteer/.local-chromium/**/*",
     "directories": {
       "buildResources": "build",
       "output": "executables"

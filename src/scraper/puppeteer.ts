@@ -5,6 +5,10 @@ import { userDefaults } from "../user/userDefaults"
 import { likesPageURL } from "./getLikes"
 export let page: puppeteer.Page
 
+function getChromiumExecPath() {
+  return puppeteer.executablePath().replace("app.asar", "app.asar.unpacked")
+}
+
 export async function createBrowser() {
   let headless = true
   if (userDefaults.get("shouldShowPuppeteerHead")) {
@@ -13,7 +17,8 @@ export async function createBrowser() {
   const browser = await puppeteer.launch({
     headless: headless,
     slowMo: constants.slowMo,
-    args: ["--no-sandbox", "--disable-notifications"] //chromium notifs get in the way when in non headless mode
+    args: ["--no-sandbox", "--disable-notifications"], //chromium notifs get in the way when in non headless mode
+    executablePath: getChromiumExecPath()
   })
   return browser
 }
@@ -35,7 +40,7 @@ export async function login() {
     !userDefaults.get("facebookProfileId") ||
     !userDefaults.get("facebookPageId")
   ) {
-    throw new Error("email or password or profileId or pageId not set")
+    throw new Error("Email, password, profile ID, or page ID can't be found")
   }
   await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
   await page.waitForSelector("#email")
@@ -47,6 +52,13 @@ export async function login() {
     //error logging in, prolly coz cookies thing
     await page.type("#pass", userDefaults.get("facebookPassword"))
     await page.click("#loginbutton")
+  }
+
+  //if the login form STILL shows, there must be some sort of error
+  if ((await page.$("#login_form")) !== null) {
+    throw new Error(
+      "There was an error logging in to facebook. Please check your credentials and other inputs."
+    )
   }
   console.log("login done")
 }
