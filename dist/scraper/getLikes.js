@@ -22,7 +22,6 @@ async function getLikedPosts() {
 exports.default = getLikedPosts;
 async function goToLikesPage() {
     const url = likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId"));
-    // await page.waitForSelector("#facebook")
     await Promise.all([puppeteer_1.page.goto(url), puppeteer_1.page.waitForNavigation()]); //extra layer of certainty
     await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Posts and Comments')]");
     console.log("at likes page");
@@ -30,6 +29,7 @@ async function goToLikesPage() {
 async function getRecentImages() {
     await puppeteer_1.page.waitForSelector(".fbTimelineLogStream"); //just because when loading the page manually i see a slightly delay between the "post and comments" title and the list of posts
     const posts = await puppeteer_1.page.$x("//a[contains(text(), 'photo') or contains(text(), 'post')]"); //get links named photo or post
+    // const posts = await page.$$("a.profileLink") //can't do this - posts don't have profile link class
     let result = [];
     for (const post of posts) {
         let type = "neither"; //even tho we query by things containing either photo or post, they query will return things with href that contain the word 'photo', so we need to validate it properly here
@@ -42,6 +42,11 @@ async function getRecentImages() {
         }
         else {
             continue; //we are not looking at a valid post
+        }
+        console.log("type: ", type);
+        const postUrl = await (await post.getProperty("href")).jsonValue();
+        if (postUrl.includes("photo.php")) {
+            continue;
         }
         //see if post was liked or reacted to
         const parent = (await post.$x(".."))[0];
@@ -59,7 +64,6 @@ async function getRecentImages() {
             }
         }
         if (reaction !== "neither") {
-            const postUrl = await (await post.getProperty("href")).jsonValue();
             // console.log("type: ", type, "href: ", postUrl, "\n\n")
             result.push({
                 postUrl,

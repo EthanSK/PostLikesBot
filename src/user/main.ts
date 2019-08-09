@@ -110,7 +110,7 @@ ipc.on("stop-running-req", async function(event, data) {
   await cleanup()
   startButtonState = "stateNotRunning"
   event.sender.send("start-state-res", startButtonState)
-  sendToConsoleOutput("Stopped run before it could complete.", "info")
+  sendToConsoleOutput("Stopped run before it could complete", "info")
 })
 
 export function setIsStopping(to: boolean) {

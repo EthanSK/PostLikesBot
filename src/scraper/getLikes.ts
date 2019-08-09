@@ -29,7 +29,6 @@ export default async function getLikedPosts() {
 
 async function goToLikesPage() {
   const url = likesPageURL(userDefaults.get("facebookProfileId"))
-  // await page.waitForSelector("#facebook")
   await Promise.all([page.goto(url), page.waitForNavigation()]) //extra layer of certainty
 
   await page.waitForXPath("//div[contains(text(), 'Posts and Comments')]")
@@ -44,6 +43,8 @@ async function getRecentImages(): Promise<GetPostsPkg[]> {
     "//a[contains(text(), 'photo') or contains(text(), 'post')]"
   ) //get links named photo or post
 
+  // const posts = await page.$$("a.profileLink") //can't do this - posts don't have profile link class
+
   let result: GetPostsPkg[] = []
   for (const post of posts) {
     let type: "photo" | "post" | "neither" = "neither" //even tho we query by things containing either photo or post, they query will return things with href that contain the word 'photo', so we need to validate it properly here
@@ -54,6 +55,12 @@ async function getRecentImages(): Promise<GetPostsPkg[]> {
       type = "post"
     } else {
       continue //we are not looking at a valid post
+    }
+    console.log("type: ", type)
+
+    const postUrl = await (await post.getProperty("href")).jsonValue()
+    if (postUrl.includes("photo.php")) {
+      continue
     }
 
     //see if post was liked or reacted to
@@ -75,7 +82,6 @@ async function getRecentImages(): Promise<GetPostsPkg[]> {
     }
 
     if (reaction! !== "neither") {
-      const postUrl = await (await post.getProperty("href")).jsonValue()
       // console.log("type: ", type, "href: ", postUrl, "\n\n")
       result.push({
         postUrl,

@@ -106,7 +106,7 @@ electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
-    sendToConsoleOutput("Stopped run before it could complete.", "info");
+    sendToConsoleOutput("Stopped run before it could complete", "info");
 });
 function setIsStopping(to) {
     isStopping = to;
