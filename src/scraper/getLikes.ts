@@ -7,6 +7,12 @@ import log from "electron-log"
 import { sendToConsoleOutput } from "../user/main"
 import { wasLastRunStoppedForcefully } from "./runner"
 
+export interface GetPostsPkg {
+  postUrl: string
+  reaction: "like" | "react"
+  type: "photo" | "post"
+}
+
 export default async function getLikedPosts() {
   try {
     await goToLikesPage()
@@ -29,22 +35,56 @@ async function goToLikesPage() {
   console.log("at likes page")
 }
 
-async function getRecentImages(): Promise<string[]> {
-  const profileLinks = await page.$$(".profileLink")
-  let validPhotoURLs: string[] = []
+async function getRecentImages(): Promise<GetPostsPkg[]> {
+  await page.waitForSelector(".fbTimelineLogStream") //just because when loading the page manually i see a slightly delay between the "post and comments" title and the list of posts
 
-  for (const profileLink of profileLinks) {
-    const hrefHandle = await profileLink.getProperty("href")
-    const innerTextHandle = await profileLink.getProperty("innerHTML")
-    const href: string = await hrefHandle.jsonValue()
-    const innerHTML: string = await innerTextHandle.jsonValue()
-    if (innerHTML === "photo" && !href.includes("photo.php")) {
-      //photo.php is only present in profile photo urls, not page photo urls, by inspection
-      validPhotoURLs.push(href)
+  const posts = await page.$x(
+    "//a[contains(text(), 'photo') or contains(text(), 'post')]"
+  ) //get links named photo or post
+
+  let result: GetPostsPkg[] = []
+  for (const post of posts) {
+    let type: "photo" | "post" | "neither" = "neither" //even tho we query by things containing either photo or post, they query will return things with href that contain the word 'photo', so we need to validate it properly here
+    const innerText = await (await post.getProperty("innerText")).jsonValue()
+    if (innerText === "photo") {
+      type = "photo"
+    } else if (innerText === "post") {
+      type = "post"
+    } else {
+      continue //we are not looking at a valid post
+    }
+
+    //see if post was liked or reacted to
+    const parent = (await post.$x(".."))[0]
+    const childTextNodes = await parent.$x("child::text()")
+    let reaction: "like" | "react" | "neither" = "neither"
+    for (const textNode of childTextNodes) {
+      const text: string = await (await textNode.getProperty(
+        "textContent"
+      )).jsonValue()
+
+      if (text.includes("like")) {
+        reaction = "like"
+        break
+      } else if (text.includes("react")) {
+        reaction = "react"
+        break
+      }
+    }
+
+    if (reaction! !== "neither") {
+      const postUrl = await (await post.getProperty("href")).jsonValue()
+      console.log("type: ", type, "href: ", postUrl, "\n\n")
+      result.push({
+        postUrl,
+        reaction: reaction!,
+        type: type === "photo" ? "photo" : "post"
+      })
     }
   }
-  console.log("valid photo post urls: ", validPhotoURLs)
-  return validPhotoURLs
+
+  console.log("result: ", result)
+  return result
 }
 
 export function likesPageURL(userProfileId: string): string {

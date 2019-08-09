@@ -110,7 +110,7 @@ ipc.on("stop-running-req", async function(event, data) {
   await cleanup()
   startButtonState = "stateNotRunning"
   event.sender.send("start-state-res", startButtonState)
-  sendToConsoleOutput("Stopped running early.", "info")
+  sendToConsoleOutput("Stopped run before it could complete.", "info")
 })
 
 export function setIsStopping(to: boolean) {
@@ -135,12 +135,12 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "shouldSkipCurrentlyLikedPosts") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs).",
+        "Will not post currently liked/reacted posts on any future runs, starting from the next run",
         "settings"
       )
     } else {
       sendToConsoleOutput(
-        "Will not skip currently liked/reacted posts, starting from next run.",
+        "Will post currently liked/reacted posts on next run, and behave as normal.",
         "settings"
       )
     }

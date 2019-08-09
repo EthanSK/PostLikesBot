@@ -7,12 +7,12 @@ import log from "electron-log"
 import { sendToConsoleOutput } from "../user/main"
 import { wasLastRunStoppedForcefully } from "./runner"
 
-export interface postMemePkg {
+export interface PostPostsPkg {
   postUrl: string
   file: string
 }
 
-export default async function postLikes(memes: postMemePkg[]) {
+export default async function postLikes(memes: PostPostsPkg[]) {
   try {
     await goToFBPage()
 
@@ -33,22 +33,30 @@ export default async function postLikes(memes: postMemePkg[]) {
 
 async function goToFBPage() {
   await page.goto(fbPageURL(userDefaults.get("facebookPageId")))
+  const [brokenPageElem] = await page.$x(
+    "//title[contains(text(), 'Page Not Found')]"
+  )
+  if (brokenPageElem) {
+    throw new Error(
+      "There was an error going to your facebook page. Please check your page ID was input correctly."
+    )
+  }
   console.log("at facebook page")
 }
 
 async function uploadImage(file: string) {
   // await delay() //needed despite waitforselector hmmm
-  await page.waitForSelector('[data-testid="photo-video-button"]')
-  await page.click('[data-testid="photo-video-button"]')
+  const selector = '[data-testid="photo-video-button"]'
+  await page.waitForSelector(selector)
+  await page.click(selector)
   // await delay()
 
   //works until here
   // await page.waitForSelector('input[type="file"]')
   // const input = await page.$('input[type="file"]')
-  await page.waitForXPath("//div[contains(text(), 'Upload Photos/Video')]")
-  const [button] = await page.$x(
-    "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
-  )
+  const xPath = "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
+  await page.waitForXPath(xPath)
+  const [button] = await page.$x(xPath)
 
   async function triggerFileSelect() {
     await button.click()

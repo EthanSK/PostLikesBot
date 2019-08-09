@@ -28,19 +28,24 @@ async function postLikes(memes) {
 exports.default = postLikes;
 async function goToFBPage() {
     await puppeteer_1.page.goto(fbPageURL(userDefaults_1.userDefaults.get("facebookPageId")));
+    const [brokenPageElem] = await puppeteer_1.page.$x("//title[contains(text(), 'Page Not Found')]");
+    if (brokenPageElem) {
+        throw new Error("There was an error going to your facebook page. Please check your page ID was input correctly.");
+    }
     console.log("at facebook page");
 }
 async function uploadImage(file) {
     // await delay() //needed despite waitforselector hmmm
-    await puppeteer_1.page.waitForSelector('[data-testid="photo-video-button"]');
-    await puppeteer_1.page.click('[data-testid="photo-video-button"]');
+    const selector = '[data-testid="photo-video-button"]';
+    await puppeteer_1.page.waitForSelector(selector);
+    await puppeteer_1.page.click(selector);
     // await delay()
     //works until here
     // await page.waitForSelector('input[type="file"]')
     // const input = await page.$('input[type="file"]')
-    await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Upload Photos/Video')]");
-    const [button] = await puppeteer_1.page.$x("//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
-    );
+    const xPath = "//div[contains(text(), 'Upload Photos/Video')]"; //needs to be text(), full stop does't work
+    await puppeteer_1.page.waitForXPath(xPath);
+    const [button] = await puppeteer_1.page.$x(xPath);
     async function triggerFileSelect() {
         await button.click();
         await utils_1.delay(1000); //because rapid succession can fucc up
@@ -63,3 +68,4 @@ function fbPageURL(pageId) {
     return `https://www.facebook.com/${pageId}`;
 }
 exports.fbPageURL = fbPageURL;
+//# sourceMappingURL=postLikes.js.map

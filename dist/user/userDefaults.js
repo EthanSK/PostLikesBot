@@ -10,3 +10,4 @@ class UserDefaults {
     }
 }
 exports.userDefaults = new UserDefaults();
+//# sourceMappingURL=userDefaults.js.map

@@ -1,11 +1,12 @@
 const constants = {
   defaultDelayMillis: 5000,
-  slowMo: 10,
+  slowMo: 1,
   screenshotsDir: "./logs/screenshots",
   databaseFile: "../db/postLikesBot.db",
   mongoDatabaseName: "PostLikesBotDB",
   appName: "Post Likes Bot",
-  maxConsoleOutputChars: 10000
+  maxConsoleOutputChars: 10000,
+  postsSaveKey: "posts"
 }
 
 export default constants

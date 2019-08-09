@@ -105,3 +105,4 @@ function sendToConsole(newText) {
     elem.scrollTop = elem.scrollHeight;
     console.log("output to console");
 }
+//# sourceMappingURL=index.js.map

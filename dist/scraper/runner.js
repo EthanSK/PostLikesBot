@@ -37,28 +37,29 @@ async function run() {
         main_1.sendToConsoleOutput("Logging in", "loading");
         await puppeteer_1.login();
         main_1.sendToConsoleOutput("Getting liked/reacted posts", "loading");
-        const urls = await getLikes_1.default();
-        if (!urls) {
-            main_1.sendToConsoleOutput("Couldn't find any post", "sadtimes");
-            return;
+        const gottenPosts = await getLikes_1.default();
+        if (!gottenPosts) {
+            main_1.sendToConsoleOutput("Couldn't find any posts", "sadtimes");
+            //CAN'T RETURN HERE OTHERWISE CLEANUP WON'T HAPPEN
         }
-        main_1.sendToConsoleOutput(`Scanning ${urls.length} most recent posts`, "loading");
+        main_1.sendToConsoleOutput(`Scanning ${gottenPosts.length} most recent posts`, "loading");
         console.log("app data store: ", electron_1.app.getPath("userData"));
-        for (const url of urls) {
-            electronStore_1.saveStoreIfNew(url); //is sync
+        for (const post of gottenPosts) {
+            electronStore_1.saveStoreIfNew(post); //is sync
         }
-        const unpostedUrls = urls.filter(url => !electronStore_1.checkIfPosted(url));
-        main_1.sendToConsoleOutput(`Found ${unpostedUrls.length} posts that need to be posted`, "info");
+        const unpostedPosts = gottenPosts.filter(post => !electronStore_1.checkIfPosted(post));
+        main_1.sendToConsoleOutput(`Found ${unpostedPosts.length} new posts that need to be posted`, "info");
         const imagesDir = electron_1.app.getPath("temp");
-        let memes = [];
-        for (const postUrl of unpostedUrls) {
-            main_1.sendToConsoleOutput(`Downloading image in post at ${postUrl}`, "loading");
-            const imageUrl = await getImageUrl(postUrl);
-            const file = path_1.default.join(imagesDir, memes.length.toString() + ".png");
+        let postsToPost = [];
+        for (const post of unpostedPosts) {
+            const reactionText = post.reaction == "like" ? "liked" : "reacted to";
+            main_1.sendToConsoleOutput(`Downloading ${reactionText} image in post at ${post.postUrl}`, "loading");
+            const imageUrl = await getImageUrl(post.postUrl);
+            const file = path_1.default.join(imagesDir, postsToPost.length.toString() + ".png");
             if (imageUrl) {
                 await utils_1.downloadImage(imageUrl, file);
-                memes.push({
-                    postUrl,
+                postsToPost.push({
+                    postUrl: post.postUrl,
                     file
                 });
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
@@ -67,10 +68,10 @@ async function run() {
                 main_1.sendToConsoleOutput("Couldn't find the image URL", "sadtimes");
             }
         }
-        if (memes.length > 0) {
+        if (postsToPost.length > 0) {
             main_1.sendToConsoleOutput("Preparing to post images to your page", "loading");
         }
-        await postLikes_1.default(memes);
+        await postLikes_1.default(postsToPost);
         main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();
         main_1.sendToConsoleOutput("Finished the batch at " + new Date(), "startstop");
@@ -93,9 +94,29 @@ function setWasLastRunStoppedForcefully(value) {
 }
 exports.setWasLastRunStoppedForcefully = setWasLastRunStoppedForcefully;
 async function getImageUrl(postUrl) {
+    // await page.goto(postUrl)
+    // await page.waitForSelector('img[class="spotlight"]')
+    // const imageUrl = await page.$eval('img[class="spotlight"]', el =>
+    //   el.getAttribute("src")
+    // )
+    // console.log("image url: ", imageUrl, "from this post: ", postUrl)
+    //^^old
     await puppeteer_1.page.goto(postUrl);
-    await puppeteer_1.page.waitForSelector('img[class="spotlight"]');
-    const imageUrl = await puppeteer_1.page.$eval('img[class="spotlight"]', el => el.getAttribute("src"));
+    const parentSelector = ".permalinkPost";
+    await puppeteer_1.page.waitForSelector(parentSelector);
+    const permalinkPost = await puppeteer_1.page.$(parentSelector);
+    await puppeteer_1.page.waitForXPath("//img[class='scaledImageFitWidth']");
+    let imgURLs = await puppeteer_1.page.$x("//img[class='scaledImageFitWidth']");
+    for (const img of imgURLs) {
+        const src = await (await img.getProperty("src")).jsonValue();
+        console.log("src of image: ", src);
+    }
+    // const childSelector = 'img[class="scaledImageFitWidth img"]'
+    // await page.waitForSelector("uiScaledImageContainer")
+    // const imageUrl = await permalinkPost!.$(childSelector, el =>
+    //   el.getAttribute("src")
+    // )
     console.log("image url: ", imageUrl, "from this post: ", postUrl);
     return imageUrl;
 }
+//# sourceMappingURL=runner.js.map

@@ -6,13 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_store_1 = __importDefault(require("electron-store"));
 const utils_1 = require("../utils");
 const store = new electron_store_1.default();
-function saveStoreIfNew(postUrl) {
-    const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `posts.${hashedKey}`;
-    const toSave = {
-        postUrl,
-        isPosted: false
-    };
+const constants_1 = __importDefault(require("../constants"));
+function saveStoreIfNew(post) {
+    const hashedKey = utils_1.hashIntFromString(post.postUrl).toString(); //so the key is guaranteed valid json
+    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}`;
+    let toSave = Object.assign(post);
+    toSave.isPosted = false;
     if (!store.has(fullKeyPath)) {
         store.set(fullKeyPath, toSave);
     }
@@ -20,13 +19,13 @@ function saveStoreIfNew(postUrl) {
 exports.saveStoreIfNew = saveStoreIfNew;
 function updateIsPosted(isPosted, postUrl) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `posts.${hashedKey}.isPosted`;
+    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
     store.set(fullKeyPath, isPosted);
 }
 exports.updateIsPosted = updateIsPosted;
-function checkIfPosted(postUrl) {
-    const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `posts.${hashedKey}.isPosted`;
+function checkIfPosted(post) {
+    const hashedKey = utils_1.hashIntFromString(post.postUrl).toString(); //so the key is guaranteed valid json
+    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
     const isPosted = store.get(fullKeyPath);
     console.log("isPosted: ", isPosted);
     return isPosted;
@@ -42,3 +41,4 @@ function getUserDefault(key) {
     return store.get(key);
 }
 exports.getUserDefault = getUserDefault;
+//# sourceMappingURL=electronStore.js.map

@@ -106,7 +106,7 @@ electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
-    sendToConsoleOutput("Stopped running early.", "info");
+    sendToConsoleOutput("Stopped run before it could complete.", "info");
 });
 function setIsStopping(to) {
     isStopping = to;
@@ -123,10 +123,10 @@ function handleUIElemChangeConsoleOutput(id, value) {
     }
     if (id === "shouldSkipCurrentlyLikedPosts") {
         if (value === true) {
-            sendToConsoleOutput("Will skip currently liked/reacted posts on next run (and prevent them being posted at all in future runs).", "settings");
+            sendToConsoleOutput("Will not post currently liked/reacted posts on any future runs, starting from the next run", "settings");
         }
         else {
-            sendToConsoleOutput("Will not skip currently liked/reacted posts, starting from next run.", "settings");
+            sendToConsoleOutput("Will post currently liked/reacted posts on next run, and behave as normal.", "settings");
         }
     }
     if (id === "shouldStartRunningWhenAppOpens") {
@@ -181,3 +181,4 @@ function sendToConsoleOutput(text, type) {
     }
 }
 exports.sendToConsoleOutput = sendToConsoleOutput;
+//# sourceMappingURL=main.js.map
