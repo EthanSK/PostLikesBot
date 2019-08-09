@@ -72,9 +72,10 @@ export async function run() {
     let postsToPost: PostPostsPkg[] = []
 
     for (const post of unpostedPosts) {
-      const reactionText = post.reaction == "like" ? "liked" : "reacted to"
+      const reactionText = post.reaction === "like" ? "liked" : "reacted to"
+      const postTypeText = post.type === "photo" ? "photo" : "image in post"
       sendToConsoleOutput(
-        `Downloading ${reactionText} image in post at ${post.postUrl}`,
+        `Downloading ${reactionText} ${postTypeText} at ${post.postUrl}`,
         "loading"
       )
       const imageUrl = await getImageUrl(post.postUrl)
@@ -87,7 +88,10 @@ export async function run() {
         })
         sendToConsoleOutput("Downloaded image successfully", "info")
       } else {
-        sendToConsoleOutput("Couldn't find the image URL", "sadtimes")
+        sendToConsoleOutput(
+          "Couldn't find the image URL (it might be a video, so it's safe to ignore this)",
+          "sadtimes"
+        )
       }
     }
     if (postsToPost.length > 0) {
@@ -114,31 +118,20 @@ export function setWasLastRunStoppedForcefully(value: boolean) {
 }
 
 async function getImageUrl(postUrl: string): Promise<string | null> {
-  // await page.goto(postUrl)
-  // await page.waitForSelector('img[class="spotlight"]')
-  // const imageUrl = await page.$eval('img[class="spotlight"]', el =>
-  //   el.getAttribute("src")
-  // )
-  // console.log("image url: ", imageUrl, "from this post: ", postUrl)
-  //^^old
-
-  await page.goto(postUrl)
-  const parentSelector = ".permalinkPost"
-  await page.waitForSelector(parentSelector)
-  const permalinkPost = await page.$(parentSelector)
-
-  await page.waitForXPath("//img[class='scaledImageFitWidth']")
-  let imgURLs = await page.$x("//img[class='scaledImageFitWidth']")
-  for (const img of imgURLs) {
-    const src = await (await img.getProperty("src")).jsonValue()
-    console.log("src of image: ", src)
+  let imageUrl: string
+  await Promise.all([page.goto(postUrl), page.waitForNavigation()])
+  try {
+    const image = await page.$(
+      ".permalinkPost img.scaledImageFitWidth.img, .permalinkPost img.scaledImageFitHeight.img"
+    )
+    imageUrl = await (await image!.getProperty("src")).jsonValue()
+    console.log("image url: ", imageUrl, "from this post: ", postUrl)
+  } catch (error) {
+    console.log(
+      "error finding image, prolly coz it's a video or no permalinkPost",
+      error.message
+    )
   }
-  // const childSelector = 'img[class="scaledImageFitWidth img"]'
-  // await page.waitForSelector("uiScaledImageContainer")
-  // const imageUrl = await permalinkPost!.$(childSelector, el =>
-  //   el.getAttribute("src")
-  // )
-  console.log("image url: ", imageUrl, "from this post: ", postUrl)
 
-  return imageUrl
+  return imageUrl!
 }

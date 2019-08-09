@@ -52,8 +52,9 @@ async function run() {
         const imagesDir = electron_1.app.getPath("temp");
         let postsToPost = [];
         for (const post of unpostedPosts) {
-            const reactionText = post.reaction == "like" ? "liked" : "reacted to";
-            main_1.sendToConsoleOutput(`Downloading ${reactionText} image in post at ${post.postUrl}`, "loading");
+            const reactionText = post.reaction === "like" ? "liked" : "reacted to";
+            const postTypeText = post.type === "photo" ? "photo" : "image in post";
+            main_1.sendToConsoleOutput(`Downloading ${reactionText} ${postTypeText} at ${post.postUrl}`, "loading");
             const imageUrl = await getImageUrl(post.postUrl);
             const file = path_1.default.join(imagesDir, postsToPost.length.toString() + ".png");
             if (imageUrl) {
@@ -65,7 +66,7 @@ async function run() {
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
             }
             else {
-                main_1.sendToConsoleOutput("Couldn't find the image URL", "sadtimes");
+                main_1.sendToConsoleOutput("Couldn't find the image URL (it might be a video, so it's safe to ignore this)", "sadtimes");
             }
         }
         if (postsToPost.length > 0) {
@@ -94,29 +95,16 @@ function setWasLastRunStoppedForcefully(value) {
 }
 exports.setWasLastRunStoppedForcefully = setWasLastRunStoppedForcefully;
 async function getImageUrl(postUrl) {
-    // await page.goto(postUrl)
-    // await page.waitForSelector('img[class="spotlight"]')
-    // const imageUrl = await page.$eval('img[class="spotlight"]', el =>
-    //   el.getAttribute("src")
-    // )
-    // console.log("image url: ", imageUrl, "from this post: ", postUrl)
-    //^^old
-    await puppeteer_1.page.goto(postUrl);
-    const parentSelector = ".permalinkPost";
-    await puppeteer_1.page.waitForSelector(parentSelector);
-    const permalinkPost = await puppeteer_1.page.$(parentSelector);
-    await puppeteer_1.page.waitForXPath("//img[class='scaledImageFitWidth']");
-    let imgURLs = await puppeteer_1.page.$x("//img[class='scaledImageFitWidth']");
-    for (const img of imgURLs) {
-        const src = await (await img.getProperty("src")).jsonValue();
-        console.log("src of image: ", src);
+    let imageUrl;
+    await Promise.all([puppeteer_1.page.goto(postUrl), puppeteer_1.page.waitForNavigation()]);
+    try {
+        const image = await puppeteer_1.page.$(".permalinkPost img.scaledImageFitWidth.img, .permalinkPost img.scaledImageFitHeight.img");
+        imageUrl = await (await image.getProperty("src")).jsonValue();
+        console.log("image url: ", imageUrl, "from this post: ", postUrl);
     }
-    // const childSelector = 'img[class="scaledImageFitWidth img"]'
-    // await page.waitForSelector("uiScaledImageContainer")
-    // const imageUrl = await permalinkPost!.$(childSelector, el =>
-    //   el.getAttribute("src")
-    // )
-    console.log("image url: ", imageUrl, "from this post: ", postUrl);
+    catch (error) {
+        console.log("error finding image, prolly coz it's a video or no permalinkPost", error.message);
+    }
     return imageUrl;
 }
 //# sourceMappingURL=runner.js.map

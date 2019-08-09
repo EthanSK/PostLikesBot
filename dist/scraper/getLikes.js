@@ -21,8 +21,9 @@ async function getLikedPosts() {
 }
 exports.default = getLikedPosts;
 async function goToLikesPage() {
-    await puppeteer_1.page.goto(likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
+    const url = likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId"));
     // await page.waitForSelector("#facebook")
+    await Promise.all([puppeteer_1.page.goto(url), puppeteer_1.page.waitForNavigation()]); //extra layer of certainty
     await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Posts and Comments')]");
     console.log("at likes page");
 }
@@ -59,7 +60,7 @@ async function getRecentImages() {
         }
         if (reaction !== "neither") {
             const postUrl = await (await post.getProperty("href")).jsonValue();
-            console.log("type: ", type, "href: ", postUrl, "\n\n");
+            // console.log("type: ", type, "href: ", postUrl, "\n\n")
             result.push({
                 postUrl,
                 reaction: reaction,

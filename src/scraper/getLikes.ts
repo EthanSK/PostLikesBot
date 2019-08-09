@@ -28,8 +28,10 @@ export default async function getLikedPosts() {
 }
 
 async function goToLikesPage() {
-  await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
+  const url = likesPageURL(userDefaults.get("facebookProfileId"))
   // await page.waitForSelector("#facebook")
+  await Promise.all([page.goto(url), page.waitForNavigation()]) //extra layer of certainty
+
   await page.waitForXPath("//div[contains(text(), 'Posts and Comments')]")
 
   console.log("at likes page")
@@ -74,7 +76,7 @@ async function getRecentImages(): Promise<GetPostsPkg[]> {
 
     if (reaction! !== "neither") {
       const postUrl = await (await post.getProperty("href")).jsonValue()
-      console.log("type: ", type, "href: ", postUrl, "\n\n")
+      // console.log("type: ", type, "href: ", postUrl, "\n\n")
       result.push({
         postUrl,
         reaction: reaction!,
