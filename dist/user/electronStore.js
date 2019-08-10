@@ -17,27 +17,36 @@ function saveStoreIfNew(post) {
     }
 }
 exports.saveStoreIfNew = saveStoreIfNew;
-function updateIsPosted(isPosted, postUrl) {
+function updateBoolProp(prop, postUrl, value) {
     const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
-    store.set(fullKeyPath, isPosted);
+    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.${prop}`;
+    store.set(fullKeyPath, value);
+}
+exports.updateBoolProp = updateBoolProp;
+function updateIsPosted(isPosted, postUrl) {
+    updateBoolProp("isPosted", postUrl, isPosted);
 }
 exports.updateIsPosted = updateIsPosted;
+function updateIsSkipped(isSkipped, postUrl) {
+    //if the user clicks don't post currently liked/reacted posts
+    updateBoolProp("isSkipped", postUrl, isSkipped);
+}
+exports.updateIsSkipped = updateIsSkipped;
 //set if couldn't find image url so we don't try again.
 function updateIsInvalidImageURL(isInvalidImageURL, postUrl) {
-    const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isInvalidImageURL`;
-    store.set(fullKeyPath, isInvalidImageURL);
+    updateBoolProp("isInvalidImageURL", postUrl, isInvalidImageURL);
 }
 exports.updateIsInvalidImageURL = updateIsInvalidImageURL;
 function checkIfNeedsPosting(post) {
     const hashedKey = utils_1.hashIntFromString(post.postUrl).toString(); //so the key is guaranteed valid json
     const fullKeyPathIsPosted = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
     const fullKeyPathIsInvalidImageURL = `${constants_1.default.postsSaveKey}.${hashedKey}.isInvalidImageURL`;
+    const fullKeyPathIsSkipped = `${constants_1.default.postsSaveKey}.${hashedKey}.isSkipped`;
     const isPosted = store.get(fullKeyPathIsPosted);
     const isInvalidImageURL = store.get(fullKeyPathIsInvalidImageURL);
+    const isSkipped = store.get(fullKeyPathIsSkipped);
     console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL);
-    return !isPosted && !isInvalidImageURL;
+    return !isPosted && !isInvalidImageURL && !isSkipped;
 }
 exports.checkIfNeedsPosting = checkIfNeedsPosting;
 function saveUserDefault(key, value) {

@@ -122,7 +122,8 @@ ipc.on("ui-elem-data-res", function(
   data: { id: UserDefaultsKey; value?: any }
 ) {
   console.log("ui data response: ", data)
-  if (!data.value) {
+  if (data.value === null || data.value === undefined) {
+    //false is fine
     console.log("no value stored for user default so not setting", data.id)
     return
   }

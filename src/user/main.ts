@@ -126,6 +126,11 @@ async function scheduleRuns() {
     }
     await run()
 
+    userDefaults.set("shouldSkipCurrentlyLikedPosts", false)
+    mainWindow!.webContents.send("ui-elem-data-res", {
+      id: "shouldSkipCurrentlyLikedPosts",
+      value: false
+    })
     let schedule = userDefaults.get("scheduleRuns")
 
     if (schedule === "once") {
@@ -228,7 +233,7 @@ function handleUIElemRes(id: UserDefaultsKey, value: any) {
   if (id === "shouldSkipCurrentlyLikedPosts") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will not post currently liked/reacted posts on any future runs, starting from the next run",
+        "Will not post currently liked/reacted posts on any future runs, starting from the next run. After one run, the checkbox will untick itself",
         "settings"
       )
     } else {

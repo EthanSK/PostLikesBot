@@ -117,6 +117,11 @@ async function scheduleRuns() {
             break;
         }
         await runner_1.run();
+        userDefaults_1.userDefaults.set("shouldSkipCurrentlyLikedPosts", false);
+        mainWindow.webContents.send("ui-elem-data-res", {
+            id: "shouldSkipCurrentlyLikedPosts",
+            value: false
+        });
         let schedule = userDefaults_1.userDefaults.get("scheduleRuns");
         if (schedule === "once") {
             !isStopping && sendToConsoleOutput("Not scheduled to run again", "info");
@@ -187,7 +192,7 @@ function handleUIElemRes(id, value) {
     }
     if (id === "shouldSkipCurrentlyLikedPosts") {
         if (value === true) {
-            sendToConsoleOutput("Will not post currently liked/reacted posts on any future runs, starting from the next run", "settings");
+            sendToConsoleOutput("Will not post currently liked/reacted posts on any future runs, starting from the next run. After one run, the checkbox will untick itself", "settings");
         }
         else {
             sendToConsoleOutput("Will post currently liked/reacted posts on next run, and behave as normal", "settings");

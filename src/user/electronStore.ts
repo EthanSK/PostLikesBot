@@ -20,22 +20,26 @@ export function saveStoreIfNew(post: GetPostsPkg) {
   }
 }
 
-export function updateIsPosted(isPosted: boolean, postUrl: string) {
+export function updateBoolProp(prop: string, postUrl: string, value: boolean) {
   const hashedKey = hashIntFromString(postUrl).toString() //so the key is guaranteed valid json
-  const fullKeyPath = `${constants.postsSaveKey}.${hashedKey}.isPosted`
-
-  store.set(fullKeyPath, isPosted)
+  const fullKeyPath = `${constants.postsSaveKey}.${hashedKey}.${prop}`
+  store.set(fullKeyPath, value)
 }
 
+export function updateIsPosted(isPosted: boolean, postUrl: string) {
+  updateBoolProp("isPosted", postUrl, isPosted)
+}
+
+export function updateIsSkipped(isSkipped: boolean, postUrl: string) {
+  //if the user clicks don't post currently liked/reacted posts
+  updateBoolProp("isSkipped", postUrl, isSkipped)
+}
 //set if couldn't find image url so we don't try again.
 export function updateIsInvalidImageURL(
   isInvalidImageURL: boolean,
   postUrl: string
 ) {
-  const hashedKey = hashIntFromString(postUrl).toString() //so the key is guaranteed valid json
-  const fullKeyPath = `${constants.postsSaveKey}.${hashedKey}.isInvalidImageURL`
-
-  store.set(fullKeyPath, isInvalidImageURL)
+  updateBoolProp("isInvalidImageURL", postUrl, isInvalidImageURL)
 }
 
 export function checkIfNeedsPosting(post: GetPostsPkg): boolean {
@@ -44,12 +48,16 @@ export function checkIfNeedsPosting(post: GetPostsPkg): boolean {
   const fullKeyPathIsInvalidImageURL = `${
     constants.postsSaveKey
   }.${hashedKey}.isInvalidImageURL`
+  const fullKeyPathIsSkipped = `${
+    constants.postsSaveKey
+  }.${hashedKey}.isSkipped`
 
   const isPosted = store.get(fullKeyPathIsPosted) as boolean
   const isInvalidImageURL = store.get(fullKeyPathIsInvalidImageURL) as boolean
+  const isSkipped = store.get(fullKeyPathIsSkipped) as boolean
 
   console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL)
-  return !isPosted && !isInvalidImageURL
+  return !isPosted && !isInvalidImageURL && !isSkipped
 }
 
 export function saveUserDefault(key: UserDefaultsKey, value: string) {

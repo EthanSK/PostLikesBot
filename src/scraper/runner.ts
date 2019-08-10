@@ -11,7 +11,8 @@ import {
   checkIfNeedsPosting,
   updateIsPosted,
   saveUserDefault,
-  updateIsInvalidImageURL
+  updateIsInvalidImageURL,
+  updateIsSkipped
 } from "../user/electronStore"
 import { app } from "electron"
 import {
@@ -41,7 +42,7 @@ export async function cleanup() {
 export async function run() {
   //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
   sendToConsoleOutput("Started running at " + new Date(), "startstop")
-
+  //don't send console out about skipping posts, coz user can change value between now and when they are actually scanned
   try {
     setWasLastRunStoppedForcefully(false)
 
@@ -72,6 +73,7 @@ export async function run() {
       `Found ${filteredPosts.length} new posts that might need to be posted`,
       "info"
     )
+
     const imagesDir = app.getPath("temp")
     let postsToPost: PostPostsPkg[] = []
 
@@ -89,6 +91,16 @@ export async function run() {
         continue
       } //then the other two still require both likes and reacts to be downloaded.
 
+      if (userDefaults.get("shouldSkipCurrentlyLikedPosts") === true) {
+        updateIsSkipped(true, post.postUrl)
+        sendToConsoleOutput(
+          `Skipping post at ${
+            post.postUrl
+          } permanently because you checked the don't post currently liked/reacted posts box`,
+          "info"
+        )
+        continue
+      }
       const reactionText = post.reaction === "like" ? "liked" : "reacted to"
       const postTypeText = post.type === "photo" ? "photo" : "image in post"
       sendToConsoleOutput(

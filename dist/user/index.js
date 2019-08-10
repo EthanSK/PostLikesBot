@@ -108,7 +108,8 @@ exports.UIElems.forEach(el => {
 });
 electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     console.log("ui data response: ", data);
-    if (!data.value) {
+    if (data.value === null || data.value === undefined) {
+        //false is fine
         console.log("no value stored for user default so not setting", data.id);
         return;
     }

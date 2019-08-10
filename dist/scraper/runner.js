@@ -31,6 +31,7 @@ exports.cleanup = cleanup;
 async function run() {
     //is a generator, the await is like pause points that allow us to, to a good degree, stop the function before the next await
     main_1.sendToConsoleOutput("Started running at " + new Date(), "startstop");
+    //don't send console out about skipping posts, coz user can change value between now and when they are actually scanned
     try {
         setWasLastRunStoppedForcefully(false);
         browser = await puppeteer_1.createBrowser();
@@ -62,6 +63,11 @@ async function run() {
                 post.reaction !== "react") {
                 continue;
             } //then the other two still require both likes and reacts to be downloaded.
+            if (userDefaults_1.userDefaults.get("shouldSkipCurrentlyLikedPosts") === true) {
+                electronStore_1.updateIsSkipped(true, post.postUrl);
+                main_1.sendToConsoleOutput(`Skipping post at ${post.postUrl} permanently because you checked the don't post currently liked/reacted posts box`, "info");
+                continue;
+            }
             const reactionText = post.reaction === "like" ? "liked" : "reacted to";
             const postTypeText = post.type === "photo" ? "photo" : "image in post";
             main_1.sendToConsoleOutput(`Downloading ${reactionText} ${postTypeText} at ${post.postUrl}`, "loading");
