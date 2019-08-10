@@ -7,7 +7,6 @@ import constants from "../constants"
 
 export interface SavePostPkg extends GetPostsPkg {
   isPosted: boolean
-  timePosted?: number
 }
 
 export function saveStoreIfNew(post: GetPostsPkg) {
@@ -28,13 +27,29 @@ export function updateIsPosted(isPosted: boolean, postUrl: string) {
   store.set(fullKeyPath, isPosted)
 }
 
-export function checkIfPosted(post: GetPostsPkg): boolean {
-  const hashedKey = hashIntFromString(post.postUrl).toString() //so the key is guaranteed valid json
-  const fullKeyPath = `${constants.postsSaveKey}.${hashedKey}.isPosted`
+//set if couldn't find image url so we don't try again.
+export function updateIsInvalidImageURL(
+  isInvalidImageURL: boolean,
+  postUrl: string
+) {
+  const hashedKey = hashIntFromString(postUrl).toString() //so the key is guaranteed valid json
+  const fullKeyPath = `${constants.postsSaveKey}.${hashedKey}.isInvalidImageURL`
 
-  const isPosted = store.get(fullKeyPath) as boolean
-  console.log("isPosted: ", isPosted)
-  return isPosted
+  store.set(fullKeyPath, isInvalidImageURL)
+}
+
+export function checkIfNeedsPosting(post: GetPostsPkg): boolean {
+  const hashedKey = hashIntFromString(post.postUrl).toString() //so the key is guaranteed valid json
+  const fullKeyPathIsPosted = `${constants.postsSaveKey}.${hashedKey}.isPosted`
+  const fullKeyPathIsInvalidImageURL = `${
+    constants.postsSaveKey
+  }.${hashedKey}.isInvalidImageURL`
+
+  const isPosted = store.get(fullKeyPathIsPosted) as boolean
+  const isInvalidImageURL = store.get(fullKeyPathIsInvalidImageURL) as boolean
+
+  console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL)
+  return !isPosted && !isInvalidImageURL
 }
 
 export function saveUserDefault(key: UserDefaultsKey, value: string) {

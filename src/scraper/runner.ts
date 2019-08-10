@@ -8,9 +8,10 @@ import path from "path"
 import constants from "../constants"
 import {
   saveStoreIfNew,
-  checkIfPosted,
+  checkIfNeedsPosting,
   updateIsPosted,
-  saveUserDefault
+  saveUserDefault,
+  updateIsInvalidImageURL
 } from "../user/electronStore"
 import { app } from "electron"
 import {
@@ -51,10 +52,12 @@ export async function run() {
     await login()
     sendToConsoleOutput("Getting liked/reacted posts", "loading")
     const gottenPosts = await getLikedPosts()
-    if (!gottenPosts) {
-      sendToConsoleOutput("Couldn't find any posts", "sadtimes")
-      //CAN'T RETURN HERE OTHERWISE CLEANUP WON'T HAPPEN
-    }
+
+    //this shows when stopping manually, and we don't want that so just don't show it
+    // if (!gottenPosts) {
+    //   sendToConsoleOutput("Couldn't find any posts", "sadtimes")
+    //   //CAN'T RETURN HERE OTHERWISE CLEANUP WON'T HAPPEN
+    // }
     sendToConsoleOutput(
       `Scanning ${gottenPosts!.length} most recent posts`,
       "loading"
@@ -64,15 +67,15 @@ export async function run() {
     for (const post of gottenPosts!) {
       saveStoreIfNew(post) //is sync
     }
-    const unpostedPosts = gottenPosts!.filter(post => !checkIfPosted(post))
+    const filteredPosts = gottenPosts!.filter(post => checkIfNeedsPosting(post))
     sendToConsoleOutput(
-      `Found ${unpostedPosts.length} new posts that need to be posted`,
+      `Found ${filteredPosts.length} new posts that need to be posted`,
       "info"
     )
     const imagesDir = app.getPath("temp")
     let postsToPost: PostPostsPkg[] = []
 
-    for (const post of unpostedPosts) {
+    for (const post of filteredPosts) {
       if (
         userDefaults.get("postPreference") === "onlyLikes" &&
         post.reaction !== "like"
@@ -103,6 +106,7 @@ export async function run() {
         })
         sendToConsoleOutput("Downloaded image successfully", "info")
       } else {
+        updateIsInvalidImageURL(true, post.postUrl)
         sendToConsoleOutput(
           "Couldn't find the image URL (the post might not be an image, so it's safe to ignore this)",
           "sadtimes"
@@ -117,7 +121,7 @@ export async function run() {
     }
     sendToConsoleOutput("Cleaning up", "loading")
     await cleanup()
-    sendToConsoleOutput("Finished the batch at " + new Date(), "startstop")
+    sendToConsoleOutput("Finished the run at " + new Date(), "startstop")
     return
   } catch (error) {
     if (!wasLastRunStoppedForcefully) {

@@ -23,14 +23,23 @@ function updateIsPosted(isPosted, postUrl) {
     store.set(fullKeyPath, isPosted);
 }
 exports.updateIsPosted = updateIsPosted;
-function checkIfPosted(post) {
-    const hashedKey = utils_1.hashIntFromString(post.postUrl).toString(); //so the key is guaranteed valid json
-    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
-    const isPosted = store.get(fullKeyPath);
-    console.log("isPosted: ", isPosted);
-    return isPosted;
+//set if couldn't find image url so we don't try again.
+function updateIsInvalidImageURL(isInvalidImageURL, postUrl) {
+    const hashedKey = utils_1.hashIntFromString(postUrl).toString(); //so the key is guaranteed valid json
+    const fullKeyPath = `${constants_1.default.postsSaveKey}.${hashedKey}.isInvalidImageURL`;
+    store.set(fullKeyPath, isInvalidImageURL);
 }
-exports.checkIfPosted = checkIfPosted;
+exports.updateIsInvalidImageURL = updateIsInvalidImageURL;
+function checkIfNeedsPosting(post) {
+    const hashedKey = utils_1.hashIntFromString(post.postUrl).toString(); //so the key is guaranteed valid json
+    const fullKeyPathIsPosted = `${constants_1.default.postsSaveKey}.${hashedKey}.isPosted`;
+    const fullKeyPathIsInvalidImageURL = `${constants_1.default.postsSaveKey}.${hashedKey}.isInvalidImageURL`;
+    const isPosted = store.get(fullKeyPathIsPosted);
+    const isInvalidImageURL = store.get(fullKeyPathIsInvalidImageURL);
+    console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL);
+    return !isPosted && !isInvalidImageURL;
+}
+exports.checkIfNeedsPosting = checkIfNeedsPosting;
 function saveUserDefault(key, value) {
     console.log("saving user default: ", key, value);
     store.set(key, value);

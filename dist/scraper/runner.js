@@ -39,20 +39,21 @@ async function run() {
         await puppeteer_1.login();
         main_1.sendToConsoleOutput("Getting liked/reacted posts", "loading");
         const gottenPosts = await getLikes_1.default();
-        if (!gottenPosts) {
-            main_1.sendToConsoleOutput("Couldn't find any posts", "sadtimes");
-            //CAN'T RETURN HERE OTHERWISE CLEANUP WON'T HAPPEN
-        }
+        //this shows when stopping manually, and we don't want that so just don't show it
+        // if (!gottenPosts) {
+        //   sendToConsoleOutput("Couldn't find any posts", "sadtimes")
+        //   //CAN'T RETURN HERE OTHERWISE CLEANUP WON'T HAPPEN
+        // }
         main_1.sendToConsoleOutput(`Scanning ${gottenPosts.length} most recent posts`, "loading");
         console.log("app data store: ", electron_1.app.getPath("userData"));
         for (const post of gottenPosts) {
             electronStore_1.saveStoreIfNew(post); //is sync
         }
-        const unpostedPosts = gottenPosts.filter(post => !electronStore_1.checkIfPosted(post));
-        main_1.sendToConsoleOutput(`Found ${unpostedPosts.length} new posts that need to be posted`, "info");
+        const filteredPosts = gottenPosts.filter(post => electronStore_1.checkIfNeedsPosting(post));
+        main_1.sendToConsoleOutput(`Found ${filteredPosts.length} new posts that need to be posted`, "info");
         const imagesDir = electron_1.app.getPath("temp");
         let postsToPost = [];
-        for (const post of unpostedPosts) {
+        for (const post of filteredPosts) {
             if (userDefaults_1.userDefaults.get("postPreference") === "onlyLikes" &&
                 post.reaction !== "like") {
                 continue;
@@ -76,6 +77,7 @@ async function run() {
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
             }
             else {
+                electronStore_1.updateIsInvalidImageURL(true, post.postUrl);
                 main_1.sendToConsoleOutput("Couldn't find the image URL (the post might not be an image, so it's safe to ignore this)", "sadtimes");
             }
         }
@@ -88,7 +90,7 @@ async function run() {
         }
         main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();
-        main_1.sendToConsoleOutput("Finished the batch at " + new Date(), "startstop");
+        main_1.sendToConsoleOutput("Finished the run at " + new Date(), "startstop");
         return;
     }
     catch (error) {

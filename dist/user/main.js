@@ -38,7 +38,6 @@ function createWindow() {
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
     mainWindow.webContents.once("did-finish-load", async function () {
-        // run() //need a start button.
         await utils_1.delay(500); //so there is no glitch when loadidng in user defaults
         mainWindow.show();
     });
@@ -96,12 +95,31 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
     if (!isStopping) {
         exports.startButtonState = "stateRunning";
         event.sender.send("start-state-res", exports.startButtonState);
-        await runner_1.run();
+        await scheduleRuns();
     }
     else {
         sendToConsoleOutput("Cannot start, process is still stopping", "info");
     }
 });
+async function scheduleRuns() {
+    for (;;) {
+        if (exports.startButtonState === "stateNotRunning" || isStopping) {
+            break;
+        }
+        await runner_1.run();
+        let schedule = userDefaults_1.userDefaults.get("scheduleRuns");
+        if (schedule === "once") {
+            sendToConsoleOutput("Not scheduled to run again", "info");
+            exports.startButtonState = "stateNotRunning";
+            mainWindow.webContents.send("start-state-res", exports.startButtonState);
+            break;
+        }
+        else {
+            sendToConsoleOutput(`Scheduled to run again in ${schedule} seconds`, "info");
+            await utils_1.delay(schedule * 1000);
+        }
+    }
+}
 electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
@@ -150,10 +168,10 @@ function handleUIElemChangeConsoleOutput(id, value) {
     }
     if (id === "shouldStartRunningWhenAppOpens") {
         if (value === true) {
-            sendToConsoleOutput("Will start running when app opens next time it opens", "settings");
+            sendToConsoleOutput("Will start running when app opens next time the app opens", "settings");
         }
         else {
-            sendToConsoleOutput("Will wait for you to click 'Start running' next time the app opens", "settings");
+            sendToConsoleOutput("Will wait for you to click 'Start' next time the app opens", "settings");
         }
     }
     if (id === "shouldOpenAtLogin") {

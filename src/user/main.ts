@@ -9,7 +9,6 @@ import { delay } from "../utils"
 let mainWindow: BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
 let isStopping: boolean = false
-
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -31,7 +30,6 @@ function createWindow() {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
   mainWindow!.webContents.once("did-finish-load", async function() {
-    // run() //need a start button.
     await delay(500) //so there is no glitch when loadidng in user defaults
     mainWindow!.show()
   })
@@ -100,11 +98,34 @@ ipc.on("start-running-req", async function(event, data) {
   if (!isStopping) {
     startButtonState = "stateRunning"
     event.sender.send("start-state-res", startButtonState)
-    await run()
+    await scheduleRuns()
   } else {
     sendToConsoleOutput("Cannot start, process is still stopping", "info")
   }
 })
+
+async function scheduleRuns() {
+  for (;;) {
+    if (startButtonState === "stateNotRunning" || isStopping) {
+      break
+    }
+    await run()
+    let schedule = userDefaults.get("scheduleRuns")
+
+    if (schedule === "once") {
+      sendToConsoleOutput("Not scheduled to run again", "info")
+      startButtonState = "stateNotRunning"
+      mainWindow!.webContents.send("start-state-res", startButtonState)
+      break
+    } else {
+      sendToConsoleOutput(
+        `Scheduled to run again in ${schedule as number} seconds`,
+        "info"
+      )
+      await delay((schedule as number) * 1000)
+    }
+  }
+}
 
 ipc.on("stop-running-req", async function(event, data) {
   console.log("orders to stop running")
@@ -175,12 +196,12 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "shouldStartRunningWhenAppOpens") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will start running when app opens next time it opens",
+        "Will start running when app opens next time the app opens",
         "settings"
       )
     } else {
       sendToConsoleOutput(
-        "Will wait for you to click 'Start running' next time the app opens",
+        "Will wait for you to click 'Start' next time the app opens",
         "settings"
       )
     }

@@ -27,7 +27,7 @@
         placeholder="👋 This app automatically posts to your facebook page(s) the image posts you liked/reacted to from other pages and groups! This is the output box."
         readonly="true"
       ></textarea>
-      <button class="stateNotRunning" id="startButton">Start running</button>
+      <button class="stateNotRunning" id="startButton">Start</button>
     </div>
 
     <div class="textBoxContainer" id="pageIdBoxContainer1">
@@ -129,15 +129,15 @@
     <div class="dropdownsContainer">
       <label class="dropdownLabel" for="scheduleRuns">Schedule runs</label>
       <select class="dropdown" id="scheduleRuns">
-        <option value="continuously">Run continuously</option>
-        <option value="10mins">Run every 10 mins</option>
-        <option value="30mins" selected="selected">Run every half hour</option>
-        <option value="1hour">Run every hour</option>
-        <option value="4hours">Run every 4 hours</option>
-        <option value="12hours">Run every 12 hours</option>
-        <option value="1day">Run every day</option>
-        <option value="2days">Run every 2 days</option>
-        <option value="5days">Run every 5 days</option>
+        <option value="0">Run continuously</option>
+        <option value="600">Run every 10 mins</option>
+        <option value="1800" selected="selected">Run every half hour</option>
+        <option value="3600">Run every hour</option>
+        <option value="14400">Run every 4 hours</option>
+        <option value="43200">Run every 12 hours</option>
+        <option value="86400">Run every day</option>
+        <option value="172800">Run every 2 days</option>
+        <option value="432000">Run every 5 days</option>
         <option value="once">Run once</option>
       </select>
     </div>

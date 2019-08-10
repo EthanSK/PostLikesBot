@@ -131,12 +131,12 @@ ipc.on("start-state-res", function(event, state) {
   const elem = document.getElementById(id)!
   switch (state) {
     case "stateRunning":
-      elem.innerText = "Stop running"
+      elem.innerText = "Stop"
       elem.classList.remove("stateNotRunning")
       elem.classList.add("stateRunning")
       break
     case "stateNotRunning":
-      elem.innerText = "Start running"
+      elem.innerText = "Start"
       elem.classList.remove("stateRunning")
       elem.classList.add("stateNotRunning")
       break
