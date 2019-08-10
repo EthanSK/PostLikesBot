@@ -19,6 +19,7 @@ const electron_log_1 = __importDefault(require("electron-log"));
 const utils_1 = require("../utils");
 let mainWindow;
 let isStopping = false;
+let startPressedCounter = 0; //used for the schedule function to id itself
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
@@ -92,6 +93,7 @@ electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
 });
 electron_1.ipcMain.on("start-running-req", async function (event, data) {
     console.log("orders to start running boss, isStopping: ", isStopping);
+    startPressedCounter++;
     if (!isStopping) {
         exports.startButtonState = "stateRunning";
         event.sender.send("start-state-res", exports.startButtonState);
@@ -102,8 +104,11 @@ electron_1.ipcMain.on("start-running-req", async function (event, data) {
     }
 });
 async function scheduleRuns() {
+    const startCountWhenCalled = startPressedCounter; //so we don't run when start is cliked again, coz that would trigger 2 running functions
     for (;;) {
-        if (exports.startButtonState === "stateNotRunning" || isStopping) {
+        if (exports.startButtonState === "stateNotRunning" ||
+            isStopping ||
+            startCountWhenCalled !== startPressedCounter) {
             break;
         }
         await runner_1.run();

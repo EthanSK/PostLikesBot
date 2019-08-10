@@ -9,6 +9,8 @@ import { delay } from "../utils"
 let mainWindow: BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
 let isStopping: boolean = false
+let startPressedCounter = 0 //used for the schedule function to id itself
+
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -95,6 +97,7 @@ ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
 
 ipc.on("start-running-req", async function(event, data) {
   console.log("orders to start running boss, isStopping: ", isStopping)
+  startPressedCounter++
   if (!isStopping) {
     startButtonState = "stateRunning"
     event.sender.send("start-state-res", startButtonState)
@@ -105,11 +108,18 @@ ipc.on("start-running-req", async function(event, data) {
 })
 
 async function scheduleRuns() {
+  const startCountWhenCalled = startPressedCounter //so we don't run when start is cliked again, coz that would trigger 2 running functions
+
   for (;;) {
-    if (startButtonState === "stateNotRunning" || isStopping) {
+    if (
+      startButtonState === "stateNotRunning" ||
+      isStopping ||
+      startCountWhenCalled !== startPressedCounter
+    ) {
       break
     }
     await run()
+
     let schedule = userDefaults.get("scheduleRuns")
 
     if (schedule === "once") {
