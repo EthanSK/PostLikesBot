@@ -41,7 +41,6 @@
         placeholder="Your page ID e.g. 106042837413146"
       />
     </div>
-
     <div class="textBoxContainer" id="pageIdBoxContainer2">
       <label class="textBoxLabel" id="textBoxLabelPageId2" for="facebookPageId"
         >facebook page ID (reacts)</label
@@ -53,6 +52,35 @@
         placeholder="Other page ID e.g. 300661440286662"
       />
     </div>
+    <div class="textBoxContainer" id="messageToPostContainer1">
+      <label
+        class="textBoxLabel"
+        id="textBoxLabelAddMessage1"
+        for="messageToPost"
+        >message to post</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="messageToPost"
+        placeholder="A message to add to posts"
+      />
+    </div>
+    <div class="textBoxContainer" id="messageToPostContainer2">
+      <label
+        class="textBoxLabel"
+        id="textBoxLabelAddMessage2"
+        for="messageToPost2"
+        >message to post (reacts)</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="messageToPost2"
+        placeholder="A message to add to posts"
+      />
+    </div>
+
     <div class="textBoxContainer">
       <label class="textBoxLabel" for="facebookProfileId"
         >facebook profile ID</label
@@ -92,6 +120,10 @@
     </div>
 
     <div class="checkBoxContainer">
+      <input type="checkbox" class="checkBox" id="shouldAddMessageToPosts" />
+      Add message to posts<br />
+    </div>
+    <div class="checkBoxContainer">
       <input
         type="checkbox"
         class="checkBox"
@@ -130,7 +162,7 @@
       <label class="dropdownLabel" for="scheduleRuns">Schedule runs</label>
       <select class="dropdown" id="scheduleRuns">
         <option value="0">Run continuously</option>
-        <option value="6">Run every 10 mins</option>
+        <option value="600">Run every 10 mins</option>
         <option value="1800" selected="selected">Run every half hour</option>
         <option value="3600">Run every hour</option>
         <option value="14400">Run every 4 hours</option>

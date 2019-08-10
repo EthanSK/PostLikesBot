@@ -123,15 +123,16 @@ async function scheduleRuns() {
     let schedule = userDefaults.get("scheduleRuns")
 
     if (schedule === "once") {
-      sendToConsoleOutput("Not scheduled to run again", "info")
+      !isStopping && sendToConsoleOutput("Not scheduled to run again", "info")
       startButtonState = "stateNotRunning"
       mainWindow!.webContents.send("start-state-res", startButtonState)
       break
     } else {
-      sendToConsoleOutput(
-        `Scheduled to run again in ${schedule as number} seconds`,
-        "info"
-      )
+      !isStopping &&
+        sendToConsoleOutput(
+          `Scheduled to run again in ${schedule as number} seconds`,
+          "info"
+        )
       await delay((schedule as number) * 1000)
     }
   }
@@ -154,7 +155,12 @@ export function setIsStopping(to: boolean) {
 
 function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "facebookPageId") {
-    sendToConsoleOutput(`Changed facebook page ID to ${value}`, "settings")
+    const likesTextIfAny =
+      userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : ""
+    sendToConsoleOutput(
+      `Changed facebook page ID ${likesTextIfAny} to ${value}`,
+      "settings"
+    )
   }
   if (id === "facebookPageId2") {
     sendToConsoleOutput(
@@ -177,13 +183,21 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
 
   if (id === "shouldShowPuppeteerHead") {
     if (value === true) {
+      sendToConsoleOutput("Will show behind-the-scenes on next run", "settings")
+    } else {
+      sendToConsoleOutput("Will hide behind-the-scenes on next run", "settings")
+    }
+  }
+
+  if (id === "shouldAddMessageToPosts") {
+    if (value === true) {
       sendToConsoleOutput(
-        "Will show behind-the-scenes on next run.",
+        "Will add message you provided in the text box to posts from now on",
         "settings"
       )
     } else {
       sendToConsoleOutput(
-        "Will hide behind-the-scenes on next run.",
+        "Will not add message to posts from now on",
         "settings"
       )
     }
@@ -197,7 +211,7 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
       )
     } else {
       sendToConsoleOutput(
-        "Will post currently liked/reacted posts on next run, and behave as normal.",
+        "Will post currently liked/reacted posts on next run, and behave as normal",
         "settings"
       )
     }

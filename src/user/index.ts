@@ -1,15 +1,18 @@
 import { ipcRenderer as ipc } from "electron"
-import { UserDefaultsKey } from "./userDefaults"
+import { UserDefaultsKey, userDefaults } from "./userDefaults"
 import constants from "../constants"
 
 export const UIElems: UserDefaultsKey[] = [
   //must be same as html id
   "facebookPageId",
   "facebookPageId2",
+  "messageToPost",
+  "messageToPost2",
   "facebookProfileId",
   "facebookEmail",
   "facebookPassword",
   "shouldShowPuppeteerHead",
+  "shouldAddMessageToPosts",
   "shouldStartRunningWhenAppOpens",
   "shouldSkipCurrentlyLikedPosts",
   "shouldOpenAtLogin",
@@ -36,14 +39,9 @@ function listenToElementChanges(id: UserDefaultsKey) {
       }
     } else if (type === "select") {
       value = (elem as HTMLSelectElement).value
-      if (id === "postPreference") {
-        if (value === "bothToDiffPages") {
-          shouldShowBothPageIdBoxes(true)
-        } else {
-          shouldShowBothPageIdBoxes(false)
-        }
-      }
     }
+    showUIElemsIfNeeded(id) //this needs to be done after the value changes so we have the new value
+
     console.log("new value: ", value, "type: ", type)
     const data = {
       id,
@@ -53,20 +51,60 @@ function listenToElementChanges(id: UserDefaultsKey) {
   }
 }
 
-function shouldShowBothPageIdBoxes(value: boolean) {
-  // const boxContainer1 = document.getElementById("pageIdBoxContainer1")!
-  console.log("shouldShowBothPageIdBoxes()", value)
-  const boxContainer2 = document.getElementById("pageIdBoxContainer2")!
-  const label1 = document.getElementById("textBoxLabelPageId1")!
-  const label2 = document.getElementById("textBoxLabelPageId2")!
+function showUIElemsIfNeeded(idOfElem: UserDefaultsKey) {
+  const elemsOfInterest: UserDefaultsKey[] = [
+    "postPreference",
+    "shouldAddMessageToPosts"
+  ]
+  if (elemsOfInterest.includes(idOfElem)) {
+    //this is just for efficiency, so we don't update every time, but it shouldn't affect the logic if it is called infinitely
+    console.log("idOfElem", idOfElem)
 
-  if (value) {
-    boxContainer2.style.display = "flex"
-    label1.innerText = "facebook page ID (likes)"
-    label2.innerText = "facebook page ID (reacts)"
-  } else {
-    boxContainer2.style.display = "none"
-    label1.innerText = "facebook page ID"
+    updateDueToPostPreference()
+    updateDueToAddMessage()
+  }
+
+  function updateDueToPostPreference() {
+    const boxContainer2 = document.getElementById("pageIdBoxContainer2")!
+    const label1 = document.getElementById("textBoxLabelPageId1")!
+    if (
+      (document.getElementById("postPreference") as HTMLSelectElement).value ===
+      "bothToDiffPages"
+    ) {
+      boxContainer2.style.display = "flex"
+      label1.innerText = "facebook page ID (likes)"
+    } else {
+      boxContainer2.style.display = "none"
+      label1.innerText = "facebook page ID"
+    }
+  }
+
+  function updateDueToAddMessage() {
+    const boxContainer1 = document.getElementById("messageToPostContainer1")!
+    const boxContainer2 = document.getElementById("messageToPostContainer2")!
+    const label1 = document.getElementById("textBoxLabelAddMessage1")!
+
+    if (
+      (document.getElementById("shouldAddMessageToPosts") as HTMLInputElement)
+        .checked === true
+    ) {
+      boxContainer1.style.display = "flex"
+
+      if (
+        (document.getElementById("postPreference") as HTMLSelectElement)
+          .value === "bothToDiffPages"
+      ) {
+        boxContainer2.style.display = "flex"
+
+        label1.innerText = "message to post (likes)"
+      } else {
+        label1.innerText = "message to post"
+        boxContainer2.style.display = "none"
+      }
+    } else {
+      boxContainer2.style.display = "none"
+      boxContainer1.style.display = "none"
+    }
   }
 }
 
@@ -85,7 +123,7 @@ ipc.on("ui-elem-data-res", function(
 ) {
   console.log("ui data response: ", data)
   if (!data.value) {
-    console.log("no value stored for user default so not setting")
+    console.log("no value stored for user default so not setting", data.id)
     return
   }
   const elem = document.getElementById(data.id)
@@ -99,14 +137,9 @@ ipc.on("ui-elem-data-res", function(
     }
   } else if (type === "select") {
     ;(elem as HTMLSelectElement).value = data.value
-    if (data.id === "postPreference") {
-      if (data.value === "bothToDiffPages") {
-        shouldShowBothPageIdBoxes(true)
-      } else {
-        shouldShowBothPageIdBoxes(false)
-      }
-    }
   }
+
+  showUIElemsIfNeeded(data.id)
 })
 //----
 

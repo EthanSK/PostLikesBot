@@ -3,10 +3,13 @@ import { getUserDefault, saveUserDefault } from "./electronStore"
 export type UserDefaultsKey =
   | "facebookPageId"
   | "facebookPageId2" //for reacts box
+  | "messageToPost"
+  | "messageToPost2"
   | "facebookProfileId"
   | "facebookEmail"
   | "facebookPassword"
   | "shouldShowPuppeteerHead"
+  | "shouldAddMessageToPosts"
   | "shouldStartRunningWhenAppOpens"
   | "shouldSkipCurrentlyLikedPosts"
   | "shouldOpenAtLogin"

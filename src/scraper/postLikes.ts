@@ -96,6 +96,8 @@ async function uploadImage(file: string) {
   console.log("sharing image")
   await page.click('[data-testid="react-composer-post-button"]')
   await delay(5000) //give it a good long delay so it can post the pic
+  // await page.waitForXPath("//span[contains(text(), 'Uploading...')]") //there is no way to wait for it to disappear
+
   console.log("upload image done")
 }
 

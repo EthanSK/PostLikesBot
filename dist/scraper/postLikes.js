@@ -72,6 +72,7 @@ async function uploadImage(file) {
     console.log("sharing image");
     await puppeteer_1.page.click('[data-testid="react-composer-post-button"]');
     await utils_1.delay(5000); //give it a good long delay so it can post the pic
+    // await page.waitForXPath("//span[contains(text(), 'Uploading...')]") //there is no way to wait for it to disappear
     console.log("upload image done");
 }
 function fbPageURL(pageId) {

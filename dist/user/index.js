@@ -9,10 +9,13 @@ exports.UIElems = [
     //must be same as html id
     "facebookPageId",
     "facebookPageId2",
+    "messageToPost",
+    "messageToPost2",
     "facebookProfileId",
     "facebookEmail",
     "facebookPassword",
     "shouldShowPuppeteerHead",
+    "shouldAddMessageToPosts",
     "shouldStartRunningWhenAppOpens",
     "shouldSkipCurrentlyLikedPosts",
     "shouldOpenAtLogin",
@@ -38,15 +41,8 @@ function listenToElementChanges(id) {
         }
         else if (type === "select") {
             value = elem.value;
-            if (id === "postPreference") {
-                if (value === "bothToDiffPages") {
-                    shouldShowBothPageIdBoxes(true);
-                }
-                else {
-                    shouldShowBothPageIdBoxes(false);
-                }
-            }
         }
+        showUIElemsIfNeeded(id); //this needs to be done after the value changes so we have the new value
         console.log("new value: ", value, "type: ", type);
         const data = {
             id,
@@ -55,20 +51,51 @@ function listenToElementChanges(id) {
         electron_1.ipcRenderer.send("ui-elem-changed", data);
     };
 }
-function shouldShowBothPageIdBoxes(value) {
-    // const boxContainer1 = document.getElementById("pageIdBoxContainer1")!
-    console.log("shouldShowBothPageIdBoxes()", value);
-    const boxContainer2 = document.getElementById("pageIdBoxContainer2");
-    const label1 = document.getElementById("textBoxLabelPageId1");
-    const label2 = document.getElementById("textBoxLabelPageId2");
-    if (value) {
-        boxContainer2.style.display = "flex";
-        label1.innerText = "facebook page ID (likes)";
-        label2.innerText = "facebook page ID (reacts)";
+function showUIElemsIfNeeded(idOfElem) {
+    const elemsOfInterest = [
+        "postPreference",
+        "shouldAddMessageToPosts"
+    ];
+    if (elemsOfInterest.includes(idOfElem)) {
+        //this is just for efficiency, so we don't update every time, but it shouldn't affect the logic if it is called infinitely
+        console.log("idOfElem", idOfElem);
+        updateDueToPostPreference();
+        updateDueToAddMessage();
     }
-    else {
-        boxContainer2.style.display = "none";
-        label1.innerText = "facebook page ID";
+    function updateDueToPostPreference() {
+        const boxContainer2 = document.getElementById("pageIdBoxContainer2");
+        const label1 = document.getElementById("textBoxLabelPageId1");
+        if (document.getElementById("postPreference").value ===
+            "bothToDiffPages") {
+            boxContainer2.style.display = "flex";
+            label1.innerText = "facebook page ID (likes)";
+        }
+        else {
+            boxContainer2.style.display = "none";
+            label1.innerText = "facebook page ID";
+        }
+    }
+    function updateDueToAddMessage() {
+        const boxContainer1 = document.getElementById("messageToPostContainer1");
+        const boxContainer2 = document.getElementById("messageToPostContainer2");
+        const label1 = document.getElementById("textBoxLabelAddMessage1");
+        if (document.getElementById("shouldAddMessageToPosts")
+            .checked === true) {
+            boxContainer1.style.display = "flex";
+            if (document.getElementById("postPreference")
+                .value === "bothToDiffPages") {
+                boxContainer2.style.display = "flex";
+                label1.innerText = "message to post (likes)";
+            }
+            else {
+                label1.innerText = "message to post";
+                boxContainer2.style.display = "none";
+            }
+        }
+        else {
+            boxContainer2.style.display = "none";
+            boxContainer1.style.display = "none";
+        }
     }
 }
 //restore data to ui ---
@@ -82,7 +109,7 @@ exports.UIElems.forEach(el => {
 electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     console.log("ui data response: ", data);
     if (!data.value) {
-        console.log("no value stored for user default so not setting");
+        console.log("no value stored for user default so not setting", data.id);
         return;
     }
     const elem = document.getElementById(data.id);
@@ -101,15 +128,8 @@ electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     else if (type === "select") {
         ;
         elem.value = data.value;
-        if (data.id === "postPreference") {
-            if (data.value === "bothToDiffPages") {
-                shouldShowBothPageIdBoxes(true);
-            }
-            else {
-                shouldShowBothPageIdBoxes(false);
-            }
-        }
     }
+    showUIElemsIfNeeded(data.id);
 });
 //----
 function listenToStartButton() {
