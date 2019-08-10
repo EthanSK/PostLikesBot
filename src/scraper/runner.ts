@@ -69,7 +69,7 @@ export async function run() {
     }
     const filteredPosts = gottenPosts!.filter(post => checkIfNeedsPosting(post))
     sendToConsoleOutput(
-      `Found ${filteredPosts.length} new posts that need to be posted`,
+      `Found ${filteredPosts.length} new posts that might need to be posted`,
       "info"
     )
     const imagesDir = app.getPath("temp")
@@ -148,6 +148,12 @@ async function getImageUrl(postUrl: string): Promise<string | null> {
     const attempt2Selector =
       ".userContentWrapper img.scaledImageFitWidth.img, .permalinkPost img.scaledImageFitHeight.img" //so far i've only seen this selector needed for posts liked from groups. if the group post is not an image, it won't match anything which is good
 
+    const linkSelector =
+      '.permalinkPost div[data-tooltip-content="Show more information about this link"]' //we don't wanna post this since it's a link to an article or something
+    const link = await page.$(linkSelector)
+    if (link) {
+      return null
+    }
     let image = await page.$(attempt1Selector)
     if (!image) {
       image = await page.$(attempt2Selector)

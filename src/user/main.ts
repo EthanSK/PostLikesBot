@@ -14,9 +14,9 @@ let startPressedCounter = 0 //used for the schedule function to id itself
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 675,
+    height: 750,
     width: 700,
-    minHeight: 675,
+    minHeight: 750,
     minWidth: 700,
     titleBarStyle: "hiddenInset",
     title: constants.appName,
@@ -80,7 +80,7 @@ ipc.on(`ui-elem-changed`, function(
 ) {
   console.log("ipc UIElemChanged triggered on data: ", data)
   userDefaults.set(data.id, data.value)
-  handleUIElemChangeConsoleOutput(data.id, data.value)
+  handleUIElemRes(data.id, data.value)
 })
 
 ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
@@ -90,8 +90,14 @@ ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
   }
 
   console.log("res: ", res)
-  mainWindow!.webContents.once("did-finish-load", function() {
+  mainWindow!.webContents.once("did-finish-load", async function() {
     event.sender.send("ui-elem-data-res", res)
+
+    if (res.id === "shouldStartRunningWhenAppOpens" && res.value === true) {
+      startButtonState = "stateRunning"
+      mainWindow!.webContents.send("start-state-res", startButtonState)
+      await scheduleRuns()
+    }
   })
 })
 
@@ -153,7 +159,7 @@ export function setIsStopping(to: boolean) {
   isStopping = to
 }
 
-function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
+function handleUIElemRes(id: UserDefaultsKey, value: any) {
   if (id === "facebookPageId") {
     const likesTextIfAny =
       userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : "" //this assumes this function is called AFTER the user default is set
@@ -208,7 +214,7 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "shouldAddMessageToPosts") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will add message you provided in the text box to posts from now on",
+        "Will add message you provided in the text box(es) to posts from now on",
         "settings"
       )
     } else {
@@ -236,7 +242,7 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "shouldStartRunningWhenAppOpens") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will start running when app opens next time the app opens",
+        "Will start running next time the app opens",
         "settings"
       )
     } else {

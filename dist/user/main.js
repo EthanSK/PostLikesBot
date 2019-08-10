@@ -23,9 +23,9 @@ let startPressedCounter = 0; //used for the schedule function to id itself
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
-        height: 675,
+        height: 750,
         width: 700,
-        minHeight: 675,
+        minHeight: 750,
         minWidth: 700,
         titleBarStyle: "hiddenInset",
         title: constants_1.default.appName,
@@ -79,7 +79,7 @@ electron_1.app.on("activate", () => {
 electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
     console.log("ipc UIElemChanged triggered on data: ", data);
     userDefaults_1.userDefaults.set(data.id, data.value);
-    handleUIElemChangeConsoleOutput(data.id, data.value);
+    handleUIElemRes(data.id, data.value);
 });
 electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
     const res = {
@@ -87,8 +87,13 @@ electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
         value: userDefaults_1.userDefaults.get(id)
     };
     console.log("res: ", res);
-    mainWindow.webContents.once("did-finish-load", function () {
+    mainWindow.webContents.once("did-finish-load", async function () {
         event.sender.send("ui-elem-data-res", res);
+        if (res.id === "shouldStartRunningWhenAppOpens" && res.value === true) {
+            exports.startButtonState = "stateRunning";
+            mainWindow.webContents.send("start-state-res", exports.startButtonState);
+            await scheduleRuns();
+        }
     });
 });
 electron_1.ipcMain.on("start-running-req", async function (event, data) {
@@ -140,7 +145,7 @@ function setIsStopping(to) {
     isStopping = to;
 }
 exports.setIsStopping = setIsStopping;
-function handleUIElemChangeConsoleOutput(id, value) {
+function handleUIElemRes(id, value) {
     if (id === "facebookPageId") {
         const likesTextIfAny = userDefaults_1.userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : ""; //this assumes this function is called AFTER the user default is set
         sendToConsoleOutput(`Changed facebook page ID ${likesTextIfAny} to ${value}`, "settings");
@@ -174,7 +179,7 @@ function handleUIElemChangeConsoleOutput(id, value) {
     }
     if (id === "shouldAddMessageToPosts") {
         if (value === true) {
-            sendToConsoleOutput("Will add message you provided in the text box to posts from now on", "settings");
+            sendToConsoleOutput("Will add message you provided in the text box(es) to posts from now on", "settings");
         }
         else {
             sendToConsoleOutput("Will not add message to posts from now on", "settings");
@@ -190,7 +195,7 @@ function handleUIElemChangeConsoleOutput(id, value) {
     }
     if (id === "shouldStartRunningWhenAppOpens") {
         if (value === true) {
-            sendToConsoleOutput("Will start running when app opens next time the app opens", "settings");
+            sendToConsoleOutput("Will start running next time the app opens", "settings");
         }
         else {
             sendToConsoleOutput("Will wait for you to click 'Start' next time the app opens", "settings");

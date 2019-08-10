@@ -50,7 +50,7 @@ async function run() {
             electronStore_1.saveStoreIfNew(post); //is sync
         }
         const filteredPosts = gottenPosts.filter(post => electronStore_1.checkIfNeedsPosting(post));
-        main_1.sendToConsoleOutput(`Found ${filteredPosts.length} new posts that need to be posted`, "info");
+        main_1.sendToConsoleOutput(`Found ${filteredPosts.length} new posts that might need to be posted`, "info");
         const imagesDir = electron_1.app.getPath("temp");
         let postsToPost = [];
         for (const post of filteredPosts) {
@@ -116,6 +116,11 @@ async function getImageUrl(postUrl) {
         const attempt1Selector = ".permalinkPost img.scaledImageFitWidth.img, .permalinkPost img.scaledImageFitHeight.img"; //this doesn't work for group posts.
         // we could use .userContentWrapper  img.scaledImageFitWidth.img which works for everything, although there could be multiple on a page so we are relying that the first one returned is the correct one, which it should be anyway. or we query a second time if the first one didn't work. yeah i prefer that.
         const attempt2Selector = ".userContentWrapper img.scaledImageFitWidth.img, .permalinkPost img.scaledImageFitHeight.img"; //so far i've only seen this selector needed for posts liked from groups. if the group post is not an image, it won't match anything which is good
+        const linkSelector = '.permalinkPost div[data-tooltip-content="Show more information about this link"]'; //we don't wanna post this since it's a link to an article or something
+        const link = await puppeteer_1.page.$(linkSelector);
+        if (link) {
+            return null;
+        }
         let image = await puppeteer_1.page.$(attempt1Selector);
         if (!image) {
             image = await puppeteer_1.page.$(attempt2Selector);

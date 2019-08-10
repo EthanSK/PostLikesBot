@@ -7,7 +7,7 @@ const constants = {
   maxConsoleOutputChars: 10000,
   postsSaveKey: "posts",
   chromiumWidth: 1200,
-  chromiumHeight: 800
+  chromiumHeight: 900
 }
 
 export default constants
