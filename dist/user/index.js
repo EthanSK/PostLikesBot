@@ -8,6 +8,7 @@ const constants_1 = __importDefault(require("../constants"));
 exports.UIElems = [
     //must be same as html id
     "facebookPageId",
+    "facebookPageId2",
     "facebookProfileId",
     "facebookEmail",
     "facebookPassword",
@@ -37,6 +38,14 @@ function listenToElementChanges(id) {
         }
         else if (type === "select") {
             value = elem.value;
+            if (id === "postPreference") {
+                if (value === "bothToDiffPages") {
+                    shouldShowBothPageIdBoxes(true);
+                }
+                else {
+                    shouldShowBothPageIdBoxes(false);
+                }
+            }
         }
         console.log("new value: ", value, "type: ", type);
         const data = {
@@ -45,6 +54,22 @@ function listenToElementChanges(id) {
         };
         electron_1.ipcRenderer.send("ui-elem-changed", data);
     };
+}
+function shouldShowBothPageIdBoxes(value) {
+    // const boxContainer1 = document.getElementById("pageIdBoxContainer1")!
+    console.log("shouldShowBothPageIdBoxes()", value);
+    const boxContainer2 = document.getElementById("pageIdBoxContainer2");
+    const label1 = document.getElementById("textBoxLabelPageId1");
+    const label2 = document.getElementById("textBoxLabelPageId2");
+    if (value) {
+        boxContainer2.style.display = "flex";
+        label1.innerText = "facebook page ID (likes)";
+        label2.innerText = "facebook page ID (reacts)";
+    }
+    else {
+        boxContainer2.style.display = "none";
+        label1.innerText = "facebook page ID";
+    }
 }
 //restore data to ui ---
 function setupUIElem(id) {
@@ -76,6 +101,14 @@ electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     else if (type === "select") {
         ;
         elem.value = data.value;
+        if (data.id === "postPreference") {
+            if (data.value === "bothToDiffPages") {
+                shouldShowBothPageIdBoxes(true);
+            }
+            else {
+                shouldShowBothPageIdBoxes(false);
+            }
+        }
     }
 });
 //----

@@ -17,7 +17,7 @@ async function createBrowser() {
     }
     const browser = await puppeteer_1.default.launch({
         headless: headless,
-        slowMo: constants_1.default.slowMo,
+        slowMo: userDefaults_1.userDefaults.get("botSlowMo"),
         defaultViewport: null,
         args: [
             "--no-sandbox",

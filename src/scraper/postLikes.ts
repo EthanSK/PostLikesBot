@@ -9,18 +9,23 @@ import { wasLastRunStoppedForcefully } from "./runner"
 
 export interface PostPostsPkg {
   postUrl: string
+  reaction: "like" | "react"
   file: string
 }
 
 export default async function postLikes(memes: PostPostsPkg[]) {
   try {
-    await goToFBPage()
-
-    for (const meme of memes) {
-      sendToConsoleOutput(`Posting image with URL ${meme.postUrl}`, "loading")
-      await uploadImage(meme.file)
-      await updateIsPosted(true, meme.postUrl)
-      sendToConsoleOutput("Successfully posted image", "success")
+    if (userDefaults.get("postPreference") === "bothToDiffPages") {
+      await prepareAndStart(
+        memes.filter(el => el.reaction === "like"),
+        userDefaults.get("facebookPageId")
+      )
+      await prepareAndStart(
+        memes.filter(el => el.reaction === "react"),
+        userDefaults.get("facebookPageId2")
+      )
+    } else {
+      await prepareAndStart(memes, userDefaults.get("facebookPageId"))
     }
   } catch (error) {
     if (!wasLastRunStoppedForcefully) {
@@ -31,8 +36,25 @@ export default async function postLikes(memes: PostPostsPkg[]) {
   }
 }
 
-async function goToFBPage() {
-  await page.goto(fbPageURL(userDefaults.get("facebookPageId")))
+async function prepareAndStart(memes: PostPostsPkg[], pageId: string) {
+  await goToFBPage(pageId)
+  for (const meme of memes) {
+    const reactionText = meme.reaction === "like" ? "liked" : "reacted to"
+
+    sendToConsoleOutput(
+      `Posting ${reactionText} image with URL ${
+        meme.postUrl
+      } to page with ID ${pageId}`,
+      "loading"
+    )
+    await uploadImage(meme.file)
+    await updateIsPosted(true, meme.postUrl)
+    sendToConsoleOutput("Successfully posted image", "success")
+  }
+}
+
+async function goToFBPage(pageId: string) {
+  await page.goto(fbPageURL(pageId))
   const [brokenPageElem] = await page.$x(
     "//title[contains(text(), 'Page Not Found')]"
   )

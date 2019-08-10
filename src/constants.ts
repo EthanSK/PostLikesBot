@@ -1,6 +1,5 @@
 const constants = {
   defaultDelayMillis: 5000,
-  slowMo: 50,
   screenshotsDir: "./logs/screenshots",
   databaseFile: "../db/postLikesBot.db",
   mongoDatabaseName: "PostLikesBotDB",

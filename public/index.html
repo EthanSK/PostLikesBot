@@ -30,8 +30,10 @@
       <button class="stateNotRunning" id="startButton">Start running</button>
     </div>
 
-    <div class="textBoxContainer" id="pageIdSecondBoxContainer">
-      <label class="textBoxLabel" for="facebookPageId">facebook page ID</label>
+    <div class="textBoxContainer" id="pageIdBoxContainer1">
+      <label class="textBoxLabel" id="textBoxLabelPageId1" for="facebookPageId"
+        >facebook page ID</label
+      >
       <input
         type="text"
         class="textBox"
@@ -39,15 +41,16 @@
         placeholder="Your page ID e.g. 106042837413146"
       />
     </div>
-    <div class="textBoxContainer" id="pageIdSecondBoxContainer">
-      <label class="textBoxLabel" for="facebookPageId"
+
+    <div class="textBoxContainer" id="pageIdBoxContainer2">
+      <label class="textBoxLabel" id="textBoxLabelPageId2" for="facebookPageId"
         >facebook page ID (reacts)</label
       >
       <input
         type="text"
         class="textBox"
-        id="facebookPageId"
-        placeholder="Your page ID e.g. 106042837413146"
+        id="facebookPageId2"
+        placeholder="Other page ID e.g. 300661440286662"
       />
     </div>
     <div class="textBoxContainer">
@@ -113,16 +116,18 @@
       <label class="dropdownLabel" for="postPreference">Post preference</label>
       <select class="dropdown" id="postPreference">
         <option value="bothToSamePage" selected="selected"
-          >Post both to same page</option
+          >Post likes & reacts to same page</option
         >
-        <option value="bothToDiffPages">Post each to different pages</option>
+        <option value="bothToDiffPages"
+          >Post likes & reacts to different pages</option
+        >
         <option value="onlyLikes">Only post likes</option>
         <option value="onlyReacts">Only post reacts</option>
       </select>
     </div>
 
     <div class="dropdownsContainer">
-      <label class="dropdownLabel" for="scheduleRuns">Scheduled runs</label>
+      <label class="dropdownLabel" for="scheduleRuns">Schedule runs</label>
       <select class="dropdown" id="scheduleRuns">
         <option value="continuously">Run continuously</option>
         <option value="10mins">Run every 10 mins</option>
@@ -133,14 +138,15 @@
         <option value="1day">Run every day</option>
         <option value="2days">Run every 2 days</option>
         <option value="5days">Run every 5 days</option>
+        <option value="once">Run once</option>
       </select>
     </div>
 
     <div class="dropdownsContainer">
       <label class="dropdownLabel" for="botSlowMo">Bot slow-mo</label>
       <select class="dropdown" id="botSlowMo">
-        <option value="1000">1000 (REALLY slow)</option>
-        <option value="300">300 (slow)</option>
+        <option value="300">300 (slowest)</option>
+        <option value="100">100 (slow)</option>
         <option value="50">50 (realistic)</option>
         <option value="10" selected="true">10 (fast)</option>
         <option value="0">0 (fastest)</option>

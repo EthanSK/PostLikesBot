@@ -2,6 +2,7 @@ import { getUserDefault, saveUserDefault } from "./electronStore"
 
 export type UserDefaultsKey =
   | "facebookPageId"
+  | "facebookPageId2" //for reacts box
   | "facebookProfileId"
   | "facebookEmail"
   | "facebookPassword"

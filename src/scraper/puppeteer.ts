@@ -16,8 +16,8 @@ export async function createBrowser() {
   }
   const browser = await puppeteer.launch({
     headless: headless,
-    slowMo: constants.slowMo,
-    defaultViewport: null,
+    slowMo: userDefaults.get("botSlowMo"),
+    defaultViewport: null, //so the viewport changes with window size
     args: [
       "--no-sandbox",
       "--disable-notifications",

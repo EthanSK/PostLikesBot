@@ -117,6 +117,21 @@ function setIsStopping(to) {
 }
 exports.setIsStopping = setIsStopping;
 function handleUIElemChangeConsoleOutput(id, value) {
+    if (id === "facebookPageId") {
+        sendToConsoleOutput(`Changed facebook page ID to ${value}`, "settings");
+    }
+    if (id === "facebookPageId2") {
+        sendToConsoleOutput(`Changed facebook page ID (reacts) to ${value}`, "settings");
+    }
+    if (id === "facebookProfileId") {
+        sendToConsoleOutput(`Changed facebook profile ID to ${value}`, "settings");
+    }
+    if (id === "facebookEmail") {
+        sendToConsoleOutput(`Changed facebook email to ${value}`, "settings");
+    }
+    if (id === "facebookPassword") {
+        sendToConsoleOutput(`Changed facebook password`, "settings");
+    }
     if (id === "shouldShowPuppeteerHead") {
         if (value === true) {
             sendToConsoleOutput("Will show behind-the-scenes on next run.", "settings");
@@ -148,6 +163,15 @@ function handleUIElemChangeConsoleOutput(id, value) {
         else {
             sendToConsoleOutput("Will not open app at login", "settings");
         }
+    }
+    if (id === "postPreference") {
+        sendToConsoleOutput(`Changed post preference`, "settings"); //too much effort to get human readable value
+    }
+    if (id === "scheduleRuns") {
+        sendToConsoleOutput(`Changed schedule runs`, "settings");
+    }
+    if (id === "botSlowMo") {
+        sendToConsoleOutput(`Changed bot slow-mo`, "settings");
     }
 }
 function sendToConsoleOutput(text, type) {

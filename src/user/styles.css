@@ -1,6 +1,6 @@
 @font-face {
   font-family: klavika-bold;
-  src: url(../src/assets/klavikaBold.otf);
+  src: url(../assets/klavikaBold.otf);
 }
 
 .title {
@@ -139,13 +139,13 @@ input[type="checkbox"] {
 .dropdownsContainer {
   display: flex;
   background-color: transparent;
-  width: 40%;
+  width: 50%;
   height: 25px;
   align-items: center;
   justify-content: space-between;
   margin: 10px;
   max-width: 600px;
-  min-width: 350px;
+  min-width: 400px;
 }
 
 .topDropdown {
@@ -153,5 +153,5 @@ input[type="checkbox"] {
 }
 .dropdown {
   height: 25px;
-  min-width: 50%;
+  min-width: 60%;
 }

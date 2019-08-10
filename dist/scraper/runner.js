@@ -13,6 +13,7 @@ const path_1 = __importDefault(require("path"));
 const electronStore_1 = require("../user/electronStore");
 const electron_1 = require("electron");
 const main_1 = require("../user/main");
+const userDefaults_1 = require("../user/userDefaults");
 let browser;
 exports.wasLastRunStoppedForcefully = false;
 async function cleanup() {
@@ -52,6 +53,14 @@ async function run() {
         const imagesDir = electron_1.app.getPath("temp");
         let postsToPost = [];
         for (const post of unpostedPosts) {
+            if (userDefaults_1.userDefaults.get("postPreference") === "onlyLikes" &&
+                post.reaction !== "like") {
+                continue;
+            }
+            if (userDefaults_1.userDefaults.get("postPreference") === "onlyReacts" &&
+                post.reaction !== "react") {
+                continue;
+            } //then the other two still require both likes and reacts to be downloaded.
             const reactionText = post.reaction === "like" ? "liked" : "reacted to";
             const postTypeText = post.type === "photo" ? "photo" : "image in post";
             main_1.sendToConsoleOutput(`Downloading ${reactionText} ${postTypeText} at ${post.postUrl}`, "loading");
@@ -61,6 +70,7 @@ async function run() {
                 await utils_1.downloadImage(imageUrl, file);
                 postsToPost.push({
                     postUrl: post.postUrl,
+                    reaction: post.reaction,
                     file
                 });
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
@@ -70,9 +80,12 @@ async function run() {
             }
         }
         if (postsToPost.length > 0) {
-            main_1.sendToConsoleOutput("Preparing to post images to your page", "loading");
+            main_1.sendToConsoleOutput("Preparing to post images", "loading");
+            await postLikes_1.default(postsToPost);
         }
-        await postLikes_1.default(postsToPost);
+        else {
+            main_1.sendToConsoleOutput("Nothing to post", "info");
+        }
         main_1.sendToConsoleOutput("Cleaning up", "loading");
         await cleanup();
         main_1.sendToConsoleOutput("Finished the batch at " + new Date(), "startstop");

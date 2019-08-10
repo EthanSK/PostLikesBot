@@ -21,6 +21,7 @@ import {
 import { Browser } from "puppeteer"
 import log from "electron-log"
 import { GetPostsPkg } from "./getLikes"
+import { userDefaults } from "../user/userDefaults"
 
 let browser: Browser
 export let wasLastRunStoppedForcefully = false
@@ -72,6 +73,19 @@ export async function run() {
     let postsToPost: PostPostsPkg[] = []
 
     for (const post of unpostedPosts) {
+      if (
+        userDefaults.get("postPreference") === "onlyLikes" &&
+        post.reaction !== "like"
+      ) {
+        continue
+      }
+      if (
+        userDefaults.get("postPreference") === "onlyReacts" &&
+        post.reaction !== "react"
+      ) {
+        continue
+      } //then the other two still require both likes and reacts to be downloaded.
+
       const reactionText = post.reaction === "like" ? "liked" : "reacted to"
       const postTypeText = post.type === "photo" ? "photo" : "image in post"
       sendToConsoleOutput(
@@ -84,6 +98,7 @@ export async function run() {
         await downloadImage(imageUrl, file)
         postsToPost.push({
           postUrl: post.postUrl,
+          reaction: post.reaction,
           file
         })
         sendToConsoleOutput("Downloaded image successfully", "info")
@@ -95,9 +110,11 @@ export async function run() {
       }
     }
     if (postsToPost.length > 0) {
-      sendToConsoleOutput("Preparing to post images to your page", "loading")
+      sendToConsoleOutput("Preparing to post images", "loading")
+      await postLikes(postsToPost)
+    } else {
+      sendToConsoleOutput("Nothing to post", "info")
     }
-    await postLikes(postsToPost)
     sendToConsoleOutput("Cleaning up", "loading")
     await cleanup()
     sendToConsoleOutput("Finished the batch at " + new Date(), "startstop")

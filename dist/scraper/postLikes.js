@@ -8,12 +8,12 @@ const main_1 = require("../user/main");
 const runner_1 = require("./runner");
 async function postLikes(memes) {
     try {
-        await goToFBPage();
-        for (const meme of memes) {
-            main_1.sendToConsoleOutput(`Posting image with URL ${meme.postUrl}`, "loading");
-            await uploadImage(meme.file);
-            await electronStore_1.updateIsPosted(true, meme.postUrl);
-            main_1.sendToConsoleOutput("Successfully posted image", "success");
+        if (userDefaults_1.userDefaults.get("postPreference") === "bothToDiffPages") {
+            await prepareAndStart(memes.filter(el => el.reaction === "like"), userDefaults_1.userDefaults.get("facebookPageId"));
+            await prepareAndStart(memes.filter(el => el.reaction === "react"), userDefaults_1.userDefaults.get("facebookPageId2"));
+        }
+        else {
+            await prepareAndStart(memes, userDefaults_1.userDefaults.get("facebookPageId"));
         }
     }
     catch (error) {
@@ -26,8 +26,18 @@ async function postLikes(memes) {
     }
 }
 exports.default = postLikes;
-async function goToFBPage() {
-    await puppeteer_1.page.goto(fbPageURL(userDefaults_1.userDefaults.get("facebookPageId")));
+async function prepareAndStart(memes, pageId) {
+    await goToFBPage(pageId);
+    for (const meme of memes) {
+        const reactionText = meme.reaction === "like" ? "liked" : "reacted to";
+        main_1.sendToConsoleOutput(`Posting ${reactionText} image with URL ${meme.postUrl} to page with ID ${pageId}`, "loading");
+        await uploadImage(meme.file);
+        await electronStore_1.updateIsPosted(true, meme.postUrl);
+        main_1.sendToConsoleOutput("Successfully posted image", "success");
+    }
+}
+async function goToFBPage(pageId) {
+    await puppeteer_1.page.goto(fbPageURL(pageId));
     const [brokenPageElem] = await puppeteer_1.page.$x("//title[contains(text(), 'Page Not Found')]");
     if (brokenPageElem) {
         throw new Error("There was an error going to your facebook page. Please check your page ID was input correctly.");
