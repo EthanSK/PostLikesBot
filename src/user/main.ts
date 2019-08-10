@@ -156,7 +156,7 @@ export function setIsStopping(to: boolean) {
 function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "facebookPageId") {
     const likesTextIfAny =
-      userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : ""
+      userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : "" //this assumes this function is called AFTER the user default is set
     sendToConsoleOutput(
       `Changed facebook page ID ${likesTextIfAny} to ${value}`,
       "settings"
@@ -165,6 +165,22 @@ function handleUIElemChangeConsoleOutput(id: UserDefaultsKey, value: any) {
   if (id === "facebookPageId2") {
     sendToConsoleOutput(
       `Changed facebook page ID (reacts) to ${value}`,
+      "settings"
+    )
+  }
+
+  if (id === "messageToPost") {
+    const likesTextIfAny =
+      userDefaults.get("postPreference") === "bothToDiffPages" ? "(likes)" : "" //this assumes this function is called AFTER the user default is set
+    sendToConsoleOutput(
+      `Will add this message to posts ${likesTextIfAny}: ${value}`,
+      "settings"
+    )
+  }
+
+  if (id === "messageToPost2") {
+    sendToConsoleOutput(
+      `Will add this message to posts (reacts): ${value}`,
       "settings"
     )
   }
