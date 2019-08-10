@@ -9,6 +9,9 @@ export type UserDefaultsKey =
   | "shouldStartRunningWhenAppOpens"
   | "shouldSkipCurrentlyLikedPosts"
   | "shouldOpenAtLogin"
+  | "postPreference"
+  | "scheduleRuns"
+  | "botSlowMo"
 
 class UserDefaults {
   public set(key: UserDefaultsKey, value: any) {

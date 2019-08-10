@@ -16,27 +16,31 @@ const constants_1 = __importDefault(require("../constants"));
 const userDefaults_1 = require("./userDefaults");
 const runner_1 = require("../scraper/runner");
 const electron_log_1 = __importDefault(require("electron-log"));
+const utils_1 = require("../utils");
 let mainWindow;
 let isStopping = false;
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
         height: 675,
-        width: 675,
+        width: 700,
         minHeight: 675,
-        minWidth: 675,
+        minWidth: 700,
         titleBarStyle: "hiddenInset",
         title: constants_1.default.appName,
         webPreferences: {
             nodeIntegration: true //otherwise require dosen't work in html
-        }
+        },
+        show: false // so we show when everything loaded
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../../public/index.html"));
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
-    mainWindow.webContents.once("did-finish-load", function () {
+    mainWindow.webContents.once("did-finish-load", async function () {
         // run() //need a start button.
+        await utils_1.delay(500); //so there is no glitch when loadidng in user defaults
+        mainWindow.show();
     });
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {
@@ -102,11 +106,11 @@ electron_1.ipcMain.on("stop-running-req", async function (event, data) {
     console.log("orders to stop running");
     setIsStopping(true);
     runner_1.setWasLastRunStoppedForcefully(true);
-    sendToConsoleOutput("Stopping...", "loading");
+    sendToConsoleOutput("Stopping", "loading");
     await runner_1.cleanup();
     exports.startButtonState = "stateNotRunning";
     event.sender.send("start-state-res", exports.startButtonState);
-    sendToConsoleOutput("Stopped run before it could complete", "info");
+    sendToConsoleOutput("Stopped running", "info"); //don't say before it could complete because when we add the timer it won't make sense to say that.
 });
 function setIsStopping(to) {
     isStopping = to;

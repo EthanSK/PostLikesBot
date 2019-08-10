@@ -17,7 +17,12 @@ export async function createBrowser() {
   const browser = await puppeteer.launch({
     headless: headless,
     slowMo: constants.slowMo,
-    args: ["--no-sandbox", "--disable-notifications"], //chromium notifs get in the way when in non headless mode
+    defaultViewport: null,
+    args: [
+      "--no-sandbox",
+      "--disable-notifications",
+      `--window-size=${constants.chromiumWidth},${constants.chromiumHeight}`
+    ], //chromium notifs get in the way when in non headless mode
     executablePath: getChromiumExecPath()
   })
   return browser
@@ -29,7 +34,7 @@ export async function createPage(browser: puppeteer.Browser) {
   await _page.setUserAgent(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
   ) //so we don't look like a bot
-  await _page.setViewport({ width: 1200, height: 1500 })
+  // await _page.setViewport({ width: 1200, height: 1500 })
   page = _page
 }
 

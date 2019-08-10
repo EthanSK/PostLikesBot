@@ -20,15 +20,29 @@
       />
     </div>
 
-    <textarea
-      class="console scrollable"
-      id="consoleOutput"
-      placeholder="👋 This app automatically posts to your facebook page the image posts you liked/reacted to from other pages! This is the output box."
-      readonly="true"
-    ></textarea>
+    <div class="rightColumn">
+      <textarea
+        class="console scrollable"
+        id="consoleOutput"
+        placeholder="👋 This app automatically posts to your facebook page(s) the image posts you liked/reacted to from other pages and groups! This is the output box."
+        readonly="true"
+      ></textarea>
+      <button class="stateNotRunning" id="startButton">Start running</button>
+    </div>
 
-    <div class="textBoxContainer">
+    <div class="textBoxContainer" id="pageIdSecondBoxContainer">
       <label class="textBoxLabel" for="facebookPageId">facebook page ID</label>
+      <input
+        type="text"
+        class="textBox"
+        id="facebookPageId"
+        placeholder="Your page ID e.g. 106042837413146"
+      />
+    </div>
+    <div class="textBoxContainer" id="pageIdSecondBoxContainer">
+      <label class="textBoxLabel" for="facebookPageId"
+        >facebook page ID (reacts)</label
+      >
       <input
         type="text"
         class="textBox"
@@ -70,13 +84,11 @@
     </div>
 
     <div class="checkBoxContainer">
-      <label class="checkBoxLabel" for="shouldShowPuppeteerHead"></label>
       <input type="checkbox" class="checkBox" id="shouldShowPuppeteerHead" />
       Show behind-the-scenes<br />
     </div>
 
     <div class="checkBoxContainer">
-      <label class="checkBoxLabel" for="shouldSkipCurrentlyLikedPosts"></label>
       <input
         type="checkbox"
         class="checkBox"
@@ -85,7 +97,6 @@
       Don't post currently liked/reacted posts<br />
     </div>
     <div class="checkBoxContainer">
-      <label class="checkBoxLabel" for="shouldStartRunningWhenAppOpens"></label>
       <input
         type="checkbox"
         class="checkBox"
@@ -94,11 +105,48 @@
       Start running when app opens<br />
     </div>
     <div class="checkBoxContainer">
-      <label class="checkBoxLabel" for="shouldOpenAtLogin"></label>
       <input type="checkbox" class="checkBox" id="shouldOpenAtLogin" />
       Open app at login<br />
     </div>
-    <button class="stateNotRunning" id="startButton">Start running</button>
+
+    <div class="dropdownsContainer topDropdown">
+      <label class="dropdownLabel" for="postPreference">Post preference</label>
+      <select class="dropdown" id="postPreference">
+        <option value="bothToSamePage" selected="selected"
+          >Post both to same page</option
+        >
+        <option value="bothToDiffPages">Post each to different pages</option>
+        <option value="onlyLikes">Only post likes</option>
+        <option value="onlyReacts">Only post reacts</option>
+      </select>
+    </div>
+
+    <div class="dropdownsContainer">
+      <label class="dropdownLabel" for="scheduleRuns">Scheduled runs</label>
+      <select class="dropdown" id="scheduleRuns">
+        <option value="continuously">Run continuously</option>
+        <option value="10mins">Run every 10 mins</option>
+        <option value="30mins" selected="selected">Run every half hour</option>
+        <option value="1hour">Run every hour</option>
+        <option value="4hours">Run every 4 hours</option>
+        <option value="12hours">Run every 12 hours</option>
+        <option value="1day">Run every day</option>
+        <option value="2days">Run every 2 days</option>
+        <option value="5days">Run every 5 days</option>
+      </select>
+    </div>
+
+    <div class="dropdownsContainer">
+      <label class="dropdownLabel" for="botSlowMo">Bot slow-mo</label>
+      <select class="dropdown" id="botSlowMo">
+        <option value="1000">1000 (REALLY slow)</option>
+        <option value="300">300 (slow)</option>
+        <option value="50">50 (realistic)</option>
+        <option value="10" selected="true">10 (fast)</option>
+        <option value="0">0 (fastest)</option>
+      </select>
+    </div>
+
     <script>
       require("../dist/user/index")
     </script>

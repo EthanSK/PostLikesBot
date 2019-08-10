@@ -67,11 +67,11 @@ async function uploadImage(file: string) {
     page.waitForFileChooser(),
     triggerFileSelect()
   ])
-  console.log("choosing image...")
+  console.log("choosing image")
   await fileChooser.accept([file]) //rel to project root
   await delay()
   // await page.screenshot({ path: "logs/screenshots/imagess.png" })
-  console.log("sharing image...")
+  console.log("sharing image")
   await page.click('[data-testid="react-composer-post-button"]')
   await delay(5000) //give it a good long delay so it can post the pic
   console.log("upload image done")

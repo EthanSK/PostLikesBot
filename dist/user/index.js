@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const constants_1 = __importDefault(require("../constants"));
 exports.UIElems = [
+    //must be same as html id
     "facebookPageId",
     "facebookProfileId",
     "facebookEmail",
@@ -13,22 +14,31 @@ exports.UIElems = [
     "shouldShowPuppeteerHead",
     "shouldStartRunningWhenAppOpens",
     "shouldSkipCurrentlyLikedPosts",
-    "shouldOpenAtLogin"
+    "shouldOpenAtLogin",
+    "postPreference",
+    "scheduleRuns",
+    "botSlowMo"
 ];
 //REMEMBER - all console.log goes to app window
 function listenToElementChanges(id) {
     document.getElementById(id).onchange = function () {
         console.log("element changed", id);
         const elem = document.getElementById(id);
-        const elemType = elem.getAttribute("type");
         let value;
-        if (elemType === "text" || elemType === "password") {
+        const type = elem.tagName.toLowerCase();
+        if (type === "input") {
+            const inputElemType = elem.getAttribute("type");
+            if (inputElemType === "text" || inputElemType === "password") {
+                value = elem.value;
+            }
+            else if (inputElemType === "checkbox") {
+                value = elem.checked;
+            }
+        }
+        else if (type === "select") {
             value = elem.value;
         }
-        else if (elemType === "checkbox") {
-            value = elem.checked;
-            console.log("but the value is ", value);
-        }
+        console.log("new value: ", value, "type: ", type);
         const data = {
             id,
             value
@@ -46,15 +56,26 @@ exports.UIElems.forEach(el => {
 });
 electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
     console.log("ui data response: ", data);
+    if (!data.value) {
+        console.log("no value stored for user default so not setting");
+        return;
+    }
     const elem = document.getElementById(data.id);
-    const elemType = elem.getAttribute("type");
-    if (elemType === "text" || elemType === "password") {
+    const type = elem.tagName.toLowerCase();
+    if (type === "input") {
+        const inputElemeType = elem.getAttribute("type");
+        if (inputElemeType === "text" || inputElemeType === "password") {
+            ;
+            elem.value = data.value;
+        }
+        else if (inputElemeType === "checkbox") {
+            ;
+            elem.checked = data.value;
+        }
+    }
+    else if (type === "select") {
         ;
         elem.value = data.value;
-    }
-    else if (elemType === "checkbox") {
-        ;
-        elem.checked = data.value;
     }
 });
 //----

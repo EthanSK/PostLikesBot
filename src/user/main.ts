@@ -4,6 +4,7 @@ import constants from "../constants"
 import { userDefaults, UserDefaultsKey } from "./userDefaults"
 import { cleanup, run, setWasLastRunStoppedForcefully } from "../scraper/runner"
 import log from "electron-log"
+import { delay } from "../utils"
 
 let mainWindow: BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"
@@ -13,14 +14,15 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 675,
-    width: 675,
+    width: 700,
     minHeight: 675,
-    minWidth: 675,
+    minWidth: 700,
     titleBarStyle: "hiddenInset",
     title: constants.appName,
     webPreferences: {
       nodeIntegration: true //otherwise require dosen't work in html
-    }
+    },
+    show: false // so we show when everything loaded
   })
 
   // and load the index.html of the app.
@@ -28,8 +30,10 @@ function createWindow() {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
-  mainWindow!.webContents.once("did-finish-load", function() {
+  mainWindow!.webContents.once("did-finish-load", async function() {
     // run() //need a start button.
+    await delay(500) //so there is no glitch when loadidng in user defaults
+    mainWindow!.show()
   })
   // Emitted when the window is closed.
   mainWindow.on("closed", () => {
@@ -106,11 +110,11 @@ ipc.on("stop-running-req", async function(event, data) {
   console.log("orders to stop running")
   setIsStopping(true)
   setWasLastRunStoppedForcefully(true)
-  sendToConsoleOutput("Stopping...", "loading")
+  sendToConsoleOutput("Stopping", "loading")
   await cleanup()
   startButtonState = "stateNotRunning"
   event.sender.send("start-state-res", startButtonState)
-  sendToConsoleOutput("Stopped run before it could complete", "info")
+  sendToConsoleOutput("Stopped running", "info") //don't say before it could complete because when we add the timer it won't make sense to say that.
 })
 
 export function setIsStopping(to: boolean) {

@@ -89,7 +89,7 @@ export async function run() {
         sendToConsoleOutput("Downloaded image successfully", "info")
       } else {
         sendToConsoleOutput(
-          "Couldn't find the image URL (it might not be an image, so it's safe to ignore this)",
+          "Couldn't find the image URL (the post might not be an image, so it's safe to ignore this)",
           "sadtimes"
         )
       }
