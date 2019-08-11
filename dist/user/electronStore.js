@@ -50,13 +50,17 @@ function checkIfNeedsPosting(post) {
 }
 exports.checkIfNeedsPosting = checkIfNeedsPosting;
 function saveUserDefault(key, value) {
+    // return store.clear()
     console.log("saving user default: ", key, value);
     store.set(key, value);
 }
 exports.saveUserDefault = saveUserDefault;
 function getUserDefault(key) {
+    // store.clear()
     console.log("getting user default: ", key);
-    return store.get(key);
+    const res = store.get(key);
+    // console.log("it has value: ", res)
+    return res;
 }
 exports.getUserDefault = getUserDefault;
 //# sourceMappingURL=electronStore.js.map

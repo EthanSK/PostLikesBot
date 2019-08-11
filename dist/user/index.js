@@ -36,7 +36,7 @@ function listenToElementChanges(id) {
                 value = elem.value;
             }
             else if (inputElemType === "checkbox") {
-                value = elem.checked;
+                value = elem.checked; //can't use value it always gives 'cloud_off'
             }
         }
         else if (type === "select") {
@@ -106,10 +106,24 @@ function showUIElemsIfNeeded(idOfElem) {
 //restore data to ui ---
 //send current set value to save as default if it doesn't yet exist
 function setupUIElem(id) {
+    let value;
+    const elem = document.getElementById(id);
+    const type = elem.tagName.toLowerCase();
+    if (type === "input") {
+        const inputElemType = elem.getAttribute("type");
+        if (inputElemType === "text" || inputElemType === "password") {
+            value = elem.value;
+        }
+        else if (inputElemType === "checkbox") {
+            value = elem.checked; //can't use value it always gives 'cloud_off'
+        }
+    }
+    else if (type === "select") {
+        value = elem.value;
+    }
     electron_1.ipcRenderer.send("ui-elem-data-req", {
         id,
-        value: document.getElementById(id)
-            .value
+        value
     });
 }
 exports.UIElems.forEach(el => {
@@ -133,7 +147,7 @@ electron_1.ipcRenderer.on("ui-elem-data-res", function (event, data) {
         }
         else if (inputElemeType === "checkbox") {
             ;
-            elem.checked = data.value;
+            elem.checked = data.value === true;
         }
     }
     else if (type === "select") {

@@ -35,7 +35,7 @@ function listenToElementChanges(id: UserDefaultsKey) {
       if (inputElemType === "text" || inputElemType === "password") {
         value = (elem as HTMLInputElement).value
       } else if (inputElemType === "checkbox") {
-        value = (elem as HTMLInputElement).checked
+        value = (elem as HTMLInputElement).checked //can't use value it always gives 'cloud_off'
       }
     } else if (type === "select") {
       value = (elem as HTMLSelectElement).value
@@ -119,10 +119,23 @@ function showUIElemsIfNeeded(idOfElem: UserDefaultsKey) {
 
 //send current set value to save as default if it doesn't yet exist
 function setupUIElem(id: UserDefaultsKey) {
+  let value: any
+  const elem = document.getElementById(id)
+  const type = elem!.tagName.toLowerCase()
+
+  if (type === "input") {
+    const inputElemType = elem!.getAttribute("type")
+    if (inputElemType === "text" || inputElemType === "password") {
+      value = (elem as HTMLInputElement).value
+    } else if (inputElemType === "checkbox") {
+      value = (elem as HTMLInputElement).checked //can't use value it always gives 'cloud_off'
+    }
+  } else if (type === "select") {
+    value = (elem as HTMLSelectElement).value
+  }
   ipc.send("ui-elem-data-req", {
     id,
-    value: (document.getElementById(id) as HTMLInputElement | HTMLSelectElement)
-      .value
+    value
   })
 }
 
@@ -148,7 +161,7 @@ ipc.on("ui-elem-data-res", function(
     if (inputElemeType === "text" || inputElemeType === "password") {
       ;(elem as HTMLInputElement).value = data.value
     } else if (inputElemeType === "checkbox") {
-      ;(elem as HTMLInputElement).checked = data.value
+      ;(elem as HTMLInputElement).checked = data.value === true
     }
   } else if (type === "select") {
     ;(elem as HTMLSelectElement).value = data.value
