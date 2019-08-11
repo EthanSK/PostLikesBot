@@ -49,6 +49,8 @@
       "hardenedRuntime": true
     },
     "win": {},
-    "linux": {}
+    "linux": {
+      "category": "ImageProcessing"
+    }
   }
 }
