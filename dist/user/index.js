@@ -51,6 +51,11 @@ function listenToElementChanges(id) {
         electron_1.ipcRenderer.send("ui-elem-changed", data);
     };
 }
+electron_1.ipcRenderer.send("version-num-req");
+electron_1.ipcRenderer.on("version-num-res", (event, data) => {
+    ;
+    document.getElementById("consoleOutput").placeholder += "\n\nVersion: " + data;
+});
 function showUIElemsIfNeeded(idOfElem) {
     const elemsOfInterest = [
         "postPreference",

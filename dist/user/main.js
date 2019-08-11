@@ -76,10 +76,19 @@ electron_1.app.on("activate", () => {
 });
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+electron_1.ipcMain.on("version-num-req", function (event, data) {
+    event.sender.send("version-num-res", electron_1.app.getVersion());
+});
 electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
     console.log("ipc UIElemChanged triggered on data: ", data);
     userDefaults_1.userDefaults.set(data.id, data.value);
     handleUIElemRes(data.id, data.value);
+    if (data.id === "shouldOpenAtLogin") {
+        electron_1.app.setLoginItemSettings({
+            openAtLogin: userDefaults_1.userDefaults.get("shouldOpenAtLogin"),
+            path: electron_1.app.getPath("exe") //option only applies on windows
+        });
+    }
 });
 electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
     const res = {

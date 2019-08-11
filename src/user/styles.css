@@ -14,12 +14,6 @@
   padding-top: 10px;
   -webkit-app-region: drag;
 }
-#slogan {
-  margin-top: -5px;
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 23px;
-}
 
 *:not(.title),
 *::after:not(.title),

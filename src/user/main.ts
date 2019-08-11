@@ -74,6 +74,10 @@ app.on("activate", () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
+ipc.on("version-num-req", function(event, data) {
+  event.sender.send("version-num-res", app.getVersion())
+})
+
 ipc.on(`ui-elem-changed`, function(
   event,
   data: { id: UserDefaultsKey; value: any }
@@ -81,6 +85,13 @@ ipc.on(`ui-elem-changed`, function(
   console.log("ipc UIElemChanged triggered on data: ", data)
   userDefaults.set(data.id, data.value)
   handleUIElemRes(data.id, data.value)
+
+  if (data.id === "shouldOpenAtLogin") {
+    app.setLoginItemSettings({
+      openAtLogin: userDefaults.get("shouldOpenAtLogin"),
+      path: app.getPath("exe") //option only applies on windows
+    })
+  }
 })
 
 ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {

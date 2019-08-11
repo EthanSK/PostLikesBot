@@ -51,6 +51,13 @@ function listenToElementChanges(id: UserDefaultsKey) {
   }
 }
 
+ipc.send("version-num-req")
+ipc.on("version-num-res", (event, data: string) => {
+  ;(document.getElementById(
+    "consoleOutput"
+  ) as HTMLTextAreaElement).placeholder += "\n\nVersion: " + data
+})
+
 function showUIElemsIfNeeded(idOfElem: UserDefaultsKey) {
   const elemsOfInterest: UserDefaultsKey[] = [
     "postPreference",
@@ -127,6 +134,7 @@ ipc.on("ui-elem-data-res", function(
     console.log("no value stored for user default so not setting", data.id)
     return
   }
+
   const elem = document.getElementById(data.id)
   const type = elem!.tagName.toLowerCase()
   if (type === "input") {
