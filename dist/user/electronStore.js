@@ -45,7 +45,7 @@ function checkIfNeedsPosting(post) {
     const isPosted = store.get(fullKeyPathIsPosted);
     const isInvalidImageURL = store.get(fullKeyPathIsInvalidImageURL);
     const isSkipped = store.get(fullKeyPathIsSkipped);
-    console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL);
+    console.log("isPosted: ", isPosted, "isInvalidImageURL: ", isInvalidImageURL, "isSkipped: ", isSkipped, "postURL: ", post.postUrl);
     return !isPosted && !isInvalidImageURL && !isSkipped;
 }
 exports.checkIfNeedsPosting = checkIfNeedsPosting;
