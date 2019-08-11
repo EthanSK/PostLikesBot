@@ -25,7 +25,7 @@ function createWindow() {
     mainWindow = new electron_1.BrowserWindow({
         height: 750,
         width: 700,
-        minHeight: 750,
+        minHeight: 300,
         minWidth: 700,
         titleBarStyle: "hiddenInset",
         title: constants_1.default.appName,
