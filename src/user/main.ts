@@ -14,7 +14,7 @@ let startPressedCounter = 0 //used for the schedule function to id itself
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 630,
+    height: 720,
     width: 700,
     minHeight: 300,
     minWidth: 700,

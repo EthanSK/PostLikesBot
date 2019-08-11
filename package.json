@@ -41,7 +41,7 @@
     "asar": true,
     "asarUnpack": "node_modules/puppeteer/.local-chromium/**/*",
     "directories": {
-      "buildResources": "buildAssets",
+      "buildResources": "resources",
       "output": "executables"
     },
     "mac": {
