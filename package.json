@@ -50,7 +50,8 @@
     },
     "win": {},
     "linux": {
-      "category": "ImageProcessing"
+      "category": "ImageProcessing",
+      "icon": "icons/icon.png"
     }
   }
 }
