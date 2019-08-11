@@ -1,1 +1,0 @@
-{"version":3,"file":"userDefaults.js","sourceRoot":"","sources":["../../src/user/userDefaults.ts"],"names":[],"mappings":";;AAAA,mDAAiE;AAmBjE,MAAM,YAAY;IACT,GAAG,CAAC,GAAoB,EAAE,KAAU;QACzC,+BAAe,CAAC,GAAG,EAAE,KAAK,CAAC,CAAA;IAC7B,CAAC;IACM,GAAG,CAAC,GAAoB;QAC7B,OAAO,8BAAc,CAAC,GAAG,CAAC,CAAA;IAC5B,CAAC;CACF;AAEU,QAAA,YAAY,GAAG,IAAI,YAAY,EAAE,CAAA"}
