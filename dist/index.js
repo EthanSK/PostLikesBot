@@ -54,4 +54,5 @@ async function main() {
         console.error("error: ", error);
     }
 }
-main();
+// main()
+//# sourceMappingURL=index.js.map

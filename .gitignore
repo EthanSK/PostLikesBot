@@ -1,5 +1,6 @@
 private.md
-
+executables/
+*.map
 #STANDARD THINGS TO IGNORE - COPYPASTA:
 
 #Logs

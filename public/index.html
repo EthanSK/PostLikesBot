@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../src/user/styles.css" />
+    <meta charset="UTF-8" />
+    <title>Post Likes Bot</title>
+  </head>
+  <body>
+    <div class="title">
+      <img
+        src="../src/assets/fbReactIconsLeft.png"
+        id="reactIconsLeft"
+        class="reactIcons"
+      />
+      <h1>Post Likes Bot</h1>
+      <img
+        src="../src/assets/fbReactIconsRight.png"
+        id="reactIconsRight"
+        class="reactIcons"
+      />
+    </div>
+
+    <div class="rightColumn">
+      <textarea
+        class="console scrollable"
+        id="consoleOutput"
+        placeholder="👋 This app automatically posts to your facebook page(s) the image posts you liked/reacted to from other pages and groups! This is the output box."
+        readonly="true"
+      ></textarea>
+      <button class="stateNotRunning" id="startButton">Start</button>
+    </div>
+
+    <div class="textBoxContainer" id="pageIdBoxContainer1">
+      <label class="textBoxLabel" id="textBoxLabelPageId1" for="facebookPageId"
+        >facebook page ID</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="facebookPageId"
+        placeholder="Your page ID e.g. 106042837413146"
+      />
+    </div>
+    <div class="textBoxContainer" id="pageIdBoxContainer2">
+      <label class="textBoxLabel" id="textBoxLabelPageId2" for="facebookPageId"
+        >facebook page ID (reacts)</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="facebookPageId2"
+        placeholder="Other page ID e.g. 300661440286662"
+      />
+    </div>
+    <div class="textBoxContainer" id="messageToPostContainer1">
+      <label
+        class="textBoxLabel"
+        id="textBoxLabelAddMessage1"
+        for="messageToPost"
+        >message to post</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="messageToPost"
+        placeholder="A message to add to posts"
+      />
+    </div>
+    <div class="textBoxContainer" id="messageToPostContainer2">
+      <label
+        class="textBoxLabel"
+        id="textBoxLabelAddMessage2"
+        for="messageToPost2"
+        >message to post (reacts)</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="messageToPost2"
+        placeholder="A message to add to posts"
+      />
+    </div>
+
+    <div class="textBoxContainer">
+      <label class="textBoxLabel" for="facebookProfileId"
+        >facebook profile ID</label
+      >
+      <input
+        type="text"
+        class="textBox"
+        id="facebookProfileId"
+        placeholder="Your profile ID e.g. ethan.sarifkattan"
+      />
+    </div>
+    <div class="textBoxContainer">
+      <label class="textBoxLabel" for="facebookEmail">facebook email</label>
+      <input
+        type="text"
+        class="textBox"
+        id="facebookEmail"
+        placeholder="Your facebook email"
+      />
+    </div>
+
+    <div class="textBoxContainer">
+      <label class="textBoxLabel" for="facebookPassword"
+        >facebook password</label
+      >
+      <input
+        type="password"
+        class="textBox"
+        id="facebookPassword"
+        placeholder="Your facebook password"
+      />
+    </div>
+
+    <div class="checkBoxContainer">
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldShowPuppeteerHead"
+        value="off"
+      />
+      Show behind-the-scenes<br />
+    </div>
+
+    <div class="checkBoxContainer">
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldAddMessageToPosts"
+        value="off"
+      />
+      Add message to posts<br />
+    </div>
+    <div class="checkBoxContainer">
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldSkipCurrentlyLikedPosts"
+        value="off"
+      />
+      Don't post currently liked/reacted posts<br />
+    </div>
+    <div class="checkBoxContainer">
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldStartRunningWhenAppOpens"
+        value="off"
+      />
+      Start running when app opens<br />
+    </div>
+    <div class="checkBoxContainer">
+      <input
+        type="checkbox"
+        class="checkBox"
+        id="shouldOpenAtLogin"
+        value="off"
+      />
+      Open app at login<br />
+    </div>
+
+    <div class="dropdownsContainer topDropdown">
+      <label class="dropdownLabel" for="postPreference">Post preference</label>
+      <select class="dropdown" id="postPreference">
+        <option value="bothToSamePage" selected="selected"
+          >Post likes & reacts to same page</option
+        >
+        <option value="bothToDiffPages"
+          >Post likes & reacts to different pages</option
+        >
+        <option value="onlyLikes">Only post likes</option>
+        <option value="onlyReacts">Only post reacts</option>
+      </select>
+    </div>
+
+    <div class="dropdownsContainer">
+      <label class="dropdownLabel" for="scheduleRuns">Schedule runs</label>
+      <select class="dropdown" id="scheduleRuns">
+        <option value="0">Run continuously (seems unrealistic)</option>
+        <option value="600">Run every 10 mins</option>
+        <option value="1800" selected="selected">Run every half hour</option>
+        <option value="3600">Run every hour</option>
+        <option value="14400">Run every 4 hours</option>
+        <option value="43200">Run every 12 hours</option>
+        <option value="86400">Run every day</option>
+        <option value="172800">Run every 2 days</option>
+        <option value="432000">Run every 5 days</option>
+        <option value="once">Run once</option>
+      </select>
+    </div>
+
+    <div class="dropdownsContainer">
+      <label class="dropdownLabel" for="botSlowMo">Bot slow-mo</label>
+      <select class="dropdown" id="botSlowMo">
+        <option value="300">300 (slowest)</option>
+        <option value="100">100 (slow)</option>
+        <option value="50">50 (realistic)</option>
+        <option value="10" selected="true">10 (fast)</option>
+        <option value="0">0 (fastest)</option>
+      </select>
+    </div>
+
+    <script>
+      require("../dist/user/index")
+    </script>
+  </body>
+</html>

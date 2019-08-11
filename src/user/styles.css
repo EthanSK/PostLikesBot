@@ -1,0 +1,151 @@
+@font-face {
+  font-family: klavika-bold;
+  src: url(../assets/klavikaBold.otf);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  height: 60px;
+  justify-content: center;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  padding-top: 10px;
+  -webkit-app-region: drag;
+}
+
+*:not(.title),
+*::after:not(.title),
+*::before:not(.title) {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+  cursor: default;
+}
+
+.reactIcons {
+  display: block;
+  max-height: 30px;
+  width: auto;
+  height: auto;
+  margin: 20px;
+}
+
+#reactIcons {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 50px;
+}
+
+body {
+  background-color: #3b5998;
+  font-family: klavika-bold;
+  font-size: large;
+  color: white;
+}
+
+.textBoxContainer {
+  display: flex;
+  background-color: transparent;
+  width: 50%;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+  max-width: 600px;
+  min-width: 430px;
+}
+
+.textBox {
+  width: 50%;
+}
+
+input[type="text"],
+input[type="password"] {
+  padding-left: 10px;
+  margin-left: 10px;
+  border: 0px;
+  border-radius: 15px;
+  height: 30px;
+  outline: 0px;
+}
+
+.checkBox {
+  margin-top: 5px;
+  margin-left: 4px;
+}
+
+input[type="checkbox"] {
+  zoom: 2.5;
+  position: relative;
+  top: 2.5px;
+  border: 0px;
+  background-color: white;
+  outline: 0px;
+}
+
+.rightColumn {
+  float: right;
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+  height: 100%;
+  margin-top: -2px;
+  margin-right: 5px;
+}
+
+#startButton {
+  background-color: white;
+  border-radius: 15px;
+  border: none;
+  color: #3b5998;
+  padding: 15px 0px;
+  margin-top: 10px;
+  font-family: klavika-bold;
+  font-size: 20px;
+  cursor: pointer;
+  outline: 0px;
+}
+
+#startButton:hover {
+  /* cursor: pointer; glitchy with webkit app region drag */
+  background-color: lightgray;
+}
+
+.console {
+  /* float: right; */
+  /* width: 28%; */
+  height: 72vh;
+  border-radius: 15px;
+  border: 0px;
+  outline: 0px;
+  padding: 10px;
+  /* margin: 5px; */
+  resize: none;
+}
+
+.scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+.dropdownsContainer {
+  display: flex;
+  background-color: transparent;
+  width: 50%;
+  height: 25px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+  max-width: 600px;
+  min-width: 400px;
+}
+
+.topDropdown {
+  margin-top: 30px;
+}
+.dropdown {
+  height: 25px;
+  min-width: 60%;
+}
