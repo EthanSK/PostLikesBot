@@ -106,14 +106,15 @@ async function createAndUpload(file: string, textToAddIfAny?: string) {
   if (textToAddIfAny) {
     await addTextToPost(textToAddIfAny) //do it after coz if doing it before it changes spotlight focus
   }
-  await page.click('[data-testid="react-composer-post-button"]')
-  await delay(5000) //give it a good long delay so it can post the pic
-  // await page.waitForXPath("//span[contains(text(), 'Uploading...')]") //there is no way to wait for it to disappear
+  await page.waitForSelector('div[data-testid="media-attachment-photo"] img') //wait for image to upload before clicking post
+  console.log("uploaded image")
 
-  console.log("upload image done")
+  await page.click('[data-testid="react-composer-post-button"]')
+  await delay(10000) //it needs time to upload, and i currently can't tell for sure when it's uploaded fully even with the waiting for selector img
 }
 
 async function addTextToPost(text: string) {
+  console.log("adding text to post")
   const selector =
     'div[aria-label="Write a post..."], div[aria-label="Say something about this photo..."]'
   await page.waitForSelector(selector)

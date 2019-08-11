@@ -33,6 +33,7 @@
     "electron": "latest",
     "electron-builder": "latest"
   },
+  "postinstall": "electron-builder install-app-deps",
   "build": {
     "appId": "com.ethansk.postlikesbot",
     "productName": "Post Likes Bot",
