@@ -51,7 +51,7 @@
     "win": {},
     "linux": {
       "category": "ImageProcessing",
-      "icon": "icons/icon.png"
+      "icon": "512x512.png"
     }
   }
 }
