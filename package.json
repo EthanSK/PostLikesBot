@@ -47,6 +47,8 @@
     "mac": {
       "category": "public.app-category.productivity",
       "hardenedRuntime": true
-    }
+    },
+    "win": {},
+    "deb": {}
   }
 }

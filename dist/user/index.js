@@ -104,8 +104,13 @@ function showUIElemsIfNeeded(idOfElem) {
     }
 }
 //restore data to ui ---
+//send current set value to save as default if it doesn't yet exist
 function setupUIElem(id) {
-    electron_1.ipcRenderer.send("ui-elem-data-req", id);
+    electron_1.ipcRenderer.send("ui-elem-data-req", {
+        id,
+        value: document.getElementById(id)
+            .value
+    });
 }
 exports.UIElems.forEach(el => {
     setupUIElem(el);

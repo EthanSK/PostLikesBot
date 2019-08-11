@@ -84,16 +84,22 @@ electron_1.ipcMain.on(`ui-elem-changed`, function (event, data) {
     userDefaults_1.userDefaults.set(data.id, data.value);
     handleUIElemRes(data.id, data.value);
     if (data.id === "shouldOpenAtLogin") {
+        console.log("shouldOpenAtLogin changed leading to setloginitemsettings");
         electron_1.app.setLoginItemSettings({
             openAtLogin: userDefaults_1.userDefaults.get("shouldOpenAtLogin"),
             path: electron_1.app.getPath("exe") //option only applies on windows
         });
     }
 });
-electron_1.ipcMain.on("ui-elem-data-req", function (event, id) {
+//this should also handle setting default values if they don't exist.
+electron_1.ipcMain.on("ui-elem-data-req", function (event, data) {
+    const currentlySavedValue = userDefaults_1.userDefaults.get(data.id);
+    if (currentlySavedValue === null || currentlySavedValue === undefined) {
+        userDefaults_1.userDefaults.set(data.id, data.value);
+    }
     const res = {
-        id,
-        value: userDefaults_1.userDefaults.get(id)
+        id: data.id,
+        value: userDefaults_1.userDefaults.get(data.id)
     };
     console.log("res: ", res);
     mainWindow.webContents.once("did-finish-load", async function () {

@@ -87,6 +87,7 @@ ipc.on(`ui-elem-changed`, function(
   handleUIElemRes(data.id, data.value)
 
   if (data.id === "shouldOpenAtLogin") {
+    console.log("shouldOpenAtLogin changed leading to setloginitemsettings")
     app.setLoginItemSettings({
       openAtLogin: userDefaults.get("shouldOpenAtLogin"),
       path: app.getPath("exe") //option only applies on windows
@@ -94,10 +95,19 @@ ipc.on(`ui-elem-changed`, function(
   }
 })
 
-ipc.on("ui-elem-data-req", function(event, id: UserDefaultsKey) {
+//this should also handle setting default values if they don't exist.
+ipc.on("ui-elem-data-req", function(
+  event,
+  data: { id: UserDefaultsKey; value: any }
+) {
+  const currentlySavedValue = userDefaults.get(data.id)
+  if (currentlySavedValue === null || currentlySavedValue === undefined) {
+    userDefaults.set(data.id, data.value)
+  }
+
   const res = {
-    id,
-    value: userDefaults.get(id)
+    id: data.id,
+    value: userDefaults.get(data.id)
   }
 
   console.log("res: ", res)

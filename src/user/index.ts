@@ -116,8 +116,14 @@ function showUIElemsIfNeeded(idOfElem: UserDefaultsKey) {
 }
 
 //restore data to ui ---
+
+//send current set value to save as default if it doesn't yet exist
 function setupUIElem(id: UserDefaultsKey) {
-  ipc.send("ui-elem-data-req", id)
+  ipc.send("ui-elem-data-req", {
+    id,
+    value: (document.getElementById(id) as HTMLInputElement | HTMLSelectElement)
+      .value
+  })
 }
 
 UIElems.forEach(el => {
