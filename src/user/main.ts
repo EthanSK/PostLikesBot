@@ -254,7 +254,7 @@ function handleUIElemRes(id: UserDefaultsKey, value: any) {
   if (id === "shouldSkipCurrentlyLikedPosts") {
     if (value === true) {
       sendToConsoleOutput(
-        "Will not post currently liked/reacted posts on any future runs, starting from the next run. After one run, the checkbox will untick itself",
+        "Will not post currently liked/reacted posts on any future runs, starting from the next run. After one run, the checkbox will untick itself. If your post preference is on likes only, it will only skip likes, for example.",
         "settings"
       )
     } else {

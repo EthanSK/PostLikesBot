@@ -62,9 +62,7 @@ export function checkIfNeedsPosting(post: GetPostsPkg): boolean {
     "isInvalidImageURL: ",
     isInvalidImageURL,
     "isSkipped: ",
-    isSkipped,
-    "postURL: ",
-    post.postUrl
+    isSkipped
   )
   return !isPosted && !isInvalidImageURL && !isSkipped
 }

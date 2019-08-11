@@ -56,7 +56,7 @@ async function getRecentImages(): Promise<GetPostsPkg[]> {
     } else {
       continue //we are not looking at a valid post
     }
-    console.log("type: ", type)
+    // console.log("type: ", type)
 
     const postUrl = await (await post.getProperty("href")).jsonValue()
     if (postUrl.includes("photo.php")) {
