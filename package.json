@@ -49,6 +49,6 @@
       "hardenedRuntime": true
     },
     "win": {},
-    "deb": {}
+    "linux": {}
   }
 }
