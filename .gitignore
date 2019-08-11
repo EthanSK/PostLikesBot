@@ -101,7 +101,7 @@ typings/
 /coverage
 
 # production
-/build
+# /build #build doesn't include the production folder in this case
 
 # misc
 .DS_Store

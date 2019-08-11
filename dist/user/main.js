@@ -23,7 +23,7 @@ let startPressedCounter = 0; //used for the schedule function to id itself
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
-        height: 750,
+        height: 630,
         width: 700,
         minHeight: 300,
         minWidth: 700,
