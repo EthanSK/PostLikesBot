@@ -1,5 +1,3 @@
-import dotenv from "dotenv"
-dotenv.config()
 import getLikedPosts from "./getLikes"
 import { createPage, createBrowser, page, login } from "./puppeteer"
 import postLikes, { PostPostsPkg } from "./postLikes"
