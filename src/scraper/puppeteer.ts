@@ -58,7 +58,6 @@ export async function login() {
     await page.type("#pass", userDefaults.get("facebookPassword"))
     await page.click("#loginbutton")
   }
-
   //if the login form STILL shows, there must be some sort of error
   if ((await page.$("#login_form")) !== null) {
     throw new Error(
