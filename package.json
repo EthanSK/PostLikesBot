@@ -52,6 +52,10 @@
     "linux": {
       "category": "ImageProcessing",
       "icon": "512x512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   }
 }
