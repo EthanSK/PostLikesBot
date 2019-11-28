@@ -34,6 +34,7 @@ export async function createPage(browser: puppeteer.Browser) {
   await _page.setUserAgent(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
   ) //so we don't look like a bot
+  _page.setDefaultNavigationTimeout(400000)
   // await _page.setViewport({ width: 1200, height: 1500 })
   page = _page
 }
@@ -49,6 +50,7 @@ export async function login() {
   }
   await page.goto(likesPageURL(userDefaults.get("facebookProfileId")))
   await page.waitForSelector("#email")
+  await delay(1000) //sometimes it goes too fast even after waiting for email selector
   await page.type("#email", userDefaults.get("facebookEmail"))
   await page.type("#pass", userDefaults.get("facebookPassword"))
   await page.click("#loginbutton")

@@ -1,9 +1,5 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
+  "folders": [],
   "settings": {
     "git.ignoreLimitWarning": true,
     "debug.node.autoAttach": "off"

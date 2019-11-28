@@ -22,7 +22,7 @@ async function getLikedPosts() {
 exports.default = getLikedPosts;
 async function goToLikesPage() {
     const url = likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId"));
-    await Promise.all([puppeteer_1.page.goto(url), puppeteer_1.page.waitForNavigation()]); //extra layer of certainty
+    await Promise.all([puppeteer_1.page.goto(url), puppeteer_1.page.waitForNavigation()]); //extra layer of certainty. don't change it without testing thoroughly. it works weirdly...
     await puppeteer_1.page.waitForXPath("//div[contains(text(), 'Posts and Comments')]");
     console.log("at likes page");
 }

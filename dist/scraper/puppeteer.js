@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const constants_1 = __importDefault(require("../constants"));
+const utils_1 = require("../utils");
 const userDefaults_1 = require("../user/userDefaults");
 const getLikes_1 = require("./getLikes");
 function getChromiumExecPath() {
@@ -33,6 +34,7 @@ async function createPage(browser) {
     const _page = await browser.newPage();
     await _page.setCacheEnabled(true);
     await _page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"); //so we don't look like a bot
+    _page.setDefaultNavigationTimeout(400000);
     // await _page.setViewport({ width: 1200, height: 1500 })
     exports.page = _page;
 }
@@ -46,6 +48,7 @@ async function login() {
     }
     await exports.page.goto(getLikes_1.likesPageURL(userDefaults_1.userDefaults.get("facebookProfileId")));
     await exports.page.waitForSelector("#email");
+    await utils_1.delay(1000); //sometimes it goes too fast even after waiting for email selector
     await exports.page.type("#email", userDefaults_1.userDefaults.get("facebookEmail"));
     await exports.page.type("#pass", userDefaults_1.userDefaults.get("facebookPassword"));
     await exports.page.click("#loginbutton");
