@@ -29,7 +29,7 @@ export default async function getLikedPosts() {
 
 async function goToLikesPage() {
   const url = likesPageURL(userDefaults.get("facebookProfileId"))
-  await Promise.all([page.goto(url), page.waitForNavigation()]) //extra layer of certainty
+  await Promise.all([page.goto(url), page.waitForNavigation()]) //extra layer of certainty. don't change it without testing thoroughly. it works weirdly...
 
   await page.waitForXPath("//div[contains(text(), 'Posts and Comments')]")
 
