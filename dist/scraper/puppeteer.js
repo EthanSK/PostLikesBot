@@ -18,6 +18,7 @@ async function createBrowser() {
     }
     const browser = await puppeteer_1.default.launch({
         headless: headless,
+        devtools: true,
         slowMo: userDefaults_1.userDefaults.get("botSlowMo"),
         defaultViewport: null,
         args: [
@@ -36,6 +37,14 @@ async function createPage(browser) {
     await _page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"); //so we don't look like a bot
     _page.setDefaultNavigationTimeout(400000);
     // await _page.setViewport({ width: 1200, height: 1500 })
+    //headless seems to not work any more coz fb doesn't show certain ui elements we need. so we should just do non headless and minimize chromium. wow this just unminimizes straight away...
+    // const session = await _page.target().createCDPSession()
+    // const windowId = ((await session.send("Browser.getWindowForTarget")) as any)
+    //   .windowId
+    // await session.send("Browser.setWindowBounds", {
+    //   windowId,
+    //   bounds: { windowState: "minimized" }
+    // })
     exports.page = _page;
 }
 exports.createPage = createPage;

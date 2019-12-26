@@ -52,9 +52,7 @@ async function prepareAndStart(
     const reactionText = meme.reaction === "like" ? "liked" : "reacted to"
 
     sendToConsoleOutput(
-      `Posting ${reactionText} image with URL ${
-        meme.postUrl
-      } to page with ID ${pageId}`,
+      `Posting ${reactionText} image with URL ${meme.postUrl} to page with ID ${pageId}`,
       "loading"
     )
     if (userDefaults.get("shouldAddMessageToPosts")) {
@@ -87,7 +85,14 @@ async function createAndUpload(file: string, textToAddIfAny?: string) {
   await page.click(selector)
 
   const xPath = "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
-  await page.waitForXPath(xPath)
+  // await page.screenshot({
+  //   path: `${constants.screenshotsDir}/${Date.now()}.png`
+  // })
+  // console.log(
+  //   "took debug screenshot: ",
+  //   `${constants.screenshotsDir}/${file}.png`
+  // )
+  await page.waitForXPath(xPath) //this seems to now throw exception because fb doesn't show the upload button unless the webpage is being viewed with non headless mode
   const [button] = await page.$x(xPath)
 
   async function triggerFileSelect() {
@@ -109,7 +114,7 @@ async function createAndUpload(file: string, textToAddIfAny?: string) {
   await page.waitForSelector('div[data-testid="media-attachment-photo"] img') //wait for image to upload before clicking post
   console.log("uploaded image")
 
-  await page.click('[data-testid="react-composer-post-button"]')
+  await page.click('[data-testid="react-composer-post-button"]') //doesn't seem to find this when headless mode
   await delay(10000) //it needs time to upload, and i currently can't tell for sure when it's uploaded fully even with the waiting for selector img
 }
 
