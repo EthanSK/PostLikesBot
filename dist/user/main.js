@@ -17,6 +17,8 @@ const userDefaults_1 = require("./userDefaults");
 const runner_1 = require("../scraper/runner");
 const electron_log_1 = __importDefault(require("electron-log"));
 const utils_1 = require("../utils");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 let mainWindow;
 let isStopping = false;
 let startPressedCounter = 0; //used for the schedule function to id itself

@@ -92,9 +92,7 @@ export async function run() {
       if (userDefaults.get("shouldSkipCurrentlyLikedPosts") === true) {
         updateIsSkipped(true, post.postUrl)
         sendToConsoleOutput(
-          `Skipping post at ${
-            post.postUrl
-          } permanently because you checked the don't post currently liked/reacted posts box`,
+          `Skipping post at ${post.postUrl} permanently because you checked the don't post currently liked/reacted posts box`,
           "info"
         )
         continue
@@ -115,6 +113,7 @@ export async function run() {
           file
         })
         sendToConsoleOutput("Downloaded image successfully", "info")
+        if (process.env.NODE_ENV === "development") break //TESTING ONLY - REMOVE IN PRODUCTION
       } else {
         updateIsInvalidImageURL(true, post.postUrl)
         sendToConsoleOutput(

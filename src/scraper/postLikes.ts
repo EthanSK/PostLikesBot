@@ -79,19 +79,14 @@ async function goToFBPage(pageId: string) {
 }
 
 async function createAndUpload(file: string, textToAddIfAny?: string) {
+  //FB CHANGED THEIR HTML! this is the old way. haven't fixed it yet TODO
   const selector = '[data-testid="photo-video-button"]'
   await page.waitForSelector(selector)
 
   await page.click(selector)
 
   const xPath = "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
-  // await page.screenshot({
-  //   path: `${constants.screenshotsDir}/${Date.now()}.png`
-  // })
-  // console.log(
-  //   "took debug screenshot: ",
-  //   `${constants.screenshotsDir}/${file}.png`
-  // )
+
   await page.waitForXPath(xPath) //this seems to now throw exception because fb doesn't show the upload button unless the webpage is being viewed with non headless mode
   const [button] = await page.$x(xPath)
 
@@ -106,6 +101,10 @@ async function createAndUpload(file: string, textToAddIfAny?: string) {
   ])
   console.log("choosing image")
   await fileChooser.accept([file]) //rel to project root
+
+  // const uploadHandle = await page.waitForSelector('input[type="file" i]')
+  // uploadHandle.uploadFile(file)
+
   await delay()
   console.log("sharing image")
   if (textToAddIfAny) {

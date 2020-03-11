@@ -5,6 +5,8 @@ import { userDefaults, UserDefaultsKey } from "./userDefaults"
 import { cleanup, run, setWasLastRunStoppedForcefully } from "../scraper/runner"
 import log from "electron-log"
 import { delay } from "../utils"
+import dotenv from "dotenv"
+dotenv.config()
 
 let mainWindow: BrowserWindow | null
 export let startButtonState: "stateRunning" | "stateNotRunning"

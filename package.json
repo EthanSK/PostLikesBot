@@ -4,7 +4,7 @@
   "description": "Bot",
   "main": "dist/user/main.js",
   "scripts": {
-    "dev": "concurrently \"nodemon\" \"npm run tsWatch\"",
+    "dev": "tsc-watch --onSuccess 'npm run start'",
     "start": "electron .",
     "tsWatch": "tsc -W",
     "build": "tsc",
@@ -31,7 +31,9 @@
     "@types/puppeteer": "^1.20.3",
     "@types/request": "^2.48.4",
     "electron": "^7.1.7",
-    "electron-builder": "latest"
+    "electron-builder": "latest",
+    "tsc-watch": "^4.2.3",
+    "typescript": "^3.8.3"
   },
   "postinstall": "electron-builder install-app-deps",
   "build": {
