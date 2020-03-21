@@ -113,7 +113,7 @@ export async function run() {
           file
         })
         sendToConsoleOutput("Downloaded image successfully", "info")
-        if (process.env.NODE_ENV === "development" && counter > 2) break //TESTING ONLY - REMOVE IN PRODUCTION
+        // if (process.env.NODE_ENV === "development" && counter > 2) break //TESTING ONLY - REMOVE IN PRODUCTION
         counter++
       } else {
         updateIsInvalidImageURL(true, post.postUrl)
