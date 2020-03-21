@@ -103,7 +103,7 @@ async function createAndUpload(file: string, textToAddIfAny?: string) {
   // await fileChooser.accept([file]) //rel to project root
   //END old way
 
-  const writeAPostSelector = 'textarea[aria-label="Write a post..."]'
+  const writeAPostSelector = '[aria-label="Write a post..."]'
   await page.waitForSelector(writeAPostSelector)
   await page.click(writeAPostSelector)
 

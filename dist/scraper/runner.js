@@ -52,6 +52,7 @@ async function run() {
         main_1.sendToConsoleOutput(`Found ${filteredPosts.length} new posts that might need to be posted`, "info");
         const imagesDir = electron_1.app.getPath("temp");
         let postsToPost = [];
+        let counter = 0;
         for (const post of filteredPosts) {
             if (userDefaults_1.userDefaults.get("postPreference") === "onlyLikes" &&
                 post.reaction !== "like") {
@@ -79,7 +80,9 @@ async function run() {
                     file
                 });
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
-                // if (process.env.NODE_ENV === "development") break //TESTING ONLY - REMOVE IN PRODUCTION
+                if (process.env.NODE_ENV === "development" && counter > 2)
+                    break; //TESTING ONLY - REMOVE IN PRODUCTION
+                counter++;
             }
             else {
                 electronStore_1.updateIsInvalidImageURL(true, post.postUrl);

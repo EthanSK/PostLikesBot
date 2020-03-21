@@ -70,7 +70,7 @@ async function createAndUpload(file, textToAddIfAny) {
     // console.log("choosing image")
     // await fileChooser.accept([file]) //rel to project root
     //END old way
-    const writeAPostSelector = 'textarea[aria-label="Write a post..."]';
+    const writeAPostSelector = '[aria-label="Write a post..."]';
     await puppeteer_1.page.waitForSelector(writeAPostSelector);
     await puppeteer_1.page.click(writeAPostSelector);
     const uploadHandle = await puppeteer_1.page.waitForSelector('div[aria-label="Create a post"] input[type="file"][aria-label="Add Photo or Video"]');
