@@ -79,8 +79,7 @@ async function run() {
                     file
                 });
                 main_1.sendToConsoleOutput("Downloaded image successfully", "info");
-                if (process.env.NODE_ENV === "development")
-                    break; //TESTING ONLY - REMOVE IN PRODUCTION
+                // if (process.env.NODE_ENV === "development") break //TESTING ONLY - REMOVE IN PRODUCTION
             }
             else {
                 electronStore_1.updateIsInvalidImageURL(true, post.postUrl);

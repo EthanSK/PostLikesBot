@@ -51,34 +51,40 @@ async function goToFBPage(pageId) {
     console.log("at facebook page");
 }
 async function createAndUpload(file, textToAddIfAny) {
-    //FB CHANGED THEIR HTML! this is the old way. haven't fixed it yet TODO
-    const selector = '[data-testid="photo-video-button"]';
-    await puppeteer_1.page.waitForSelector(selector);
-    await puppeteer_1.page.click(selector);
-    const xPath = "//div[contains(text(), 'Upload Photos/Video')]"; //needs to be text(), full stop does't work
-    await puppeteer_1.page.waitForXPath(xPath); //this seems to now throw exception because fb doesn't show the upload button unless the webpage is being viewed with non headless mode
-    const [button] = await puppeteer_1.page.$x(xPath);
-    async function triggerFileSelect() {
-        await button.click();
-        await utils_1.delay(1000); //because rapid succession can fucc up
-        await button.click(); //because it seems like the first click just highlights the section
-    }
-    const [fileChooser] = await Promise.all([
-        puppeteer_1.page.waitForFileChooser(),
-        triggerFileSelect()
-    ]);
-    console.log("choosing image");
-    await fileChooser.accept([file]); //rel to project root
-    // const uploadHandle = await page.waitForSelector('input[type="file" i]')
-    // uploadHandle.uploadFile(file)
+    //FB CHANGED THEIR HTML! this is the old way
+    // const selector = '[data-testid="photo-video-button"]'
+    // await page.waitForSelector(selector)
+    // await page.click(selector)
+    // const xPath = "//div[contains(text(), 'Upload Photos/Video')]" //needs to be text(), full stop does't work
+    // await page.waitForXPath(xPath) //this seems to now throw exception because fb doesn't show the upload button unless the webpage is being viewed with non headless mode
+    // const [button] = await page.$x(xPath)
+    // async function triggerFileSelect() {
+    //   await button.click()
+    //   await delay(1000) //because rapid succession can fucc up
+    //   await button.click() //because it seems like the first click just highlights the section
+    // }
+    // const [fileChooser] = await Promise.all([
+    //   page.waitForFileChooser(),
+    //   triggerFileSelect()
+    // ])
+    // console.log("choosing image")
+    // await fileChooser.accept([file]) //rel to project root
+    //END old way
+    const writeAPostSelector = 'textarea[aria-label="Write a post..."]';
+    await puppeteer_1.page.waitForSelector(writeAPostSelector);
+    await puppeteer_1.page.click(writeAPostSelector);
+    const uploadHandle = await puppeteer_1.page.waitForSelector('div[aria-label="Create a post"] input[type="file"][aria-label="Add Photo or Video"]');
+    uploadHandle.uploadFile(file);
     await utils_1.delay();
     console.log("sharing image");
     if (textToAddIfAny) {
         await addTextToPost(textToAddIfAny); //do it after coz if doing it before it changes spotlight focus
     }
-    await puppeteer_1.page.waitForSelector('div[data-testid="media-attachment-photo"] img'); //wait for image to upload before clicking post
+    // await page.waitForSelector('div[data-testid="media-attachment-photo"] img') //wait for image to upload before clicking post //OLD WAY
+    await puppeteer_1.page.waitForSelector('button[title="Remove photo"]'); //wait for image to upload before clicking post. this waits for the x button to appear over the image, implying it has been removed.
     console.log("uploaded image");
-    await puppeteer_1.page.click('[data-testid="react-composer-post-button"]'); //doesn't seem to find this when headless mode
+    // await page.click('[data-testid="react-composer-post-button"]') //doesn't seem to find this when headless mode. // OLD WAY
+    await puppeteer_1.page.click('div[aria-label="Create a post"] button[type="submit"]');
     await utils_1.delay(10000); //it needs time to upload, and i currently can't tell for sure when it's uploaded fully even with the waiting for selector img
 }
 async function addTextToPost(text) {
