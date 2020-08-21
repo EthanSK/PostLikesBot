@@ -2,7 +2,7 @@
 
 # WARNING: This project only works with the old facebook. Contributions to get it working with the new facebook will be greatly appreciated.
 
-![Post Likes Bot](/postlikesbot.png)
+![Post Likes Bot](/resources/postlikesbot.png)
 
 ## A scraper built in Typescript and Node.JS, using Puppeteer to automatically posts things you like from your facebook feed to your facebook page
 
