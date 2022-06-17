@@ -28,7 +28,7 @@
     "@types/electron-store": "^3.2.0",
     "@types/puppeteer": "^1.20.3",
     "@types/request": "^2.48.4",
-    "electron": "^7.1.7",
+    "electron": "^15.5.5",
     "electron-builder": "latest",
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
